@@ -16,20 +16,24 @@ exports.authController = void 0;
 const database_1 = __importDefault(require("../database"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+/* carga variable de entorno */
+const dotenv_1 = __importDefault(require("dotenv"));
+dotenv_1.default.config();
 const saltRounds = 10;
 class AuthController {
     login(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { username, password } = req.body;
+            const { Email, Password } = req.body;
             try {
-                const [rows] = yield database_1.default.query('SELECT * FROM PERSONA WHERE usuario = ?', [username]);
+                const rows = yield database_1.default.query('SELECT * FROM PERSONA WHERE Email = ?', [Email]);
                 if (rows.length === 0)
                     return res.status(401).json({ error: 'Usuario no encontrado' });
                 const user = rows[0];
-                const match = yield bcrypt_1.default.compare(password, user.password);
+                const match = yield bcrypt_1.default.compare(Password, user.Password);
+                console.log(match);
                 if (!match)
                     return res.status(401).json({ error: 'Contraseña incorrecta' });
-                const token = jsonwebtoken_1.default.sign({ id: user.id, username: user.username }, process.env.JWT_SECRET, {
+                const token = jsonwebtoken_1.default.sign({ IdPersona: user.IdPersona, Email: user.Email }, process.env.JWT_SECRET, {
                     expiresIn: '2h'
                 });
                 res.json({ message: 'Login exitoso', token });
@@ -41,14 +45,19 @@ class AuthController {
     }
     register(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { username, password } = req.body;
+            const { IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Nacimiento, Email, Foto, Usuario, Password, Estado } = req.body;
             try {
-                const hashedPassword = yield bcrypt_1.default.hash(password, saltRounds);
-                yield database_1.default.query('INSERT INTO PERSONA (username, password) VALUES (?, ?)', [username, hashedPassword]);
-                res.status(201).json({ message: 'Usuario registrado' });
+                const hashedPassword = yield bcrypt_1.default.hash(Password, saltRounds);
+                yield database_1.default.query('INSERT INTO PERSONA (IDTIPOPERSONA, IDTIPODOCUMENTO, NUMDOCUMENTO, NOMBRES, APELLIDOS, DIRECCION, REFERENCIA, NACIMIENTO, EMAIL, FOTO, USUARIO, PASSWORD, ESTADO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Nacimiento, Email, Foto, Usuario, hashedPassword, Estado]);
+                res.status(201).json({
+                    message: 'Usuario registrado',
+                    /* data: [] */
+                });
             }
             catch (error) {
-                res.status(500).json({ error: 'Error al registrar usuario' });
+                res.status(500).json({
+                    error: 'Error al registrar usuario'
+                });
             }
         });
     }

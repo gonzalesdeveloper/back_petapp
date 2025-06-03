@@ -8,8 +8,8 @@ class AuthRoutes {
         this.config();
     }
     config() {
-        this.router.post('/auth/login', authController_1.authController.login);
-        this.router.post('/auth/register', authController_1.authController.register);
+        this.router.post('/login', authController_1.authController.login);
+        this.router.post('/register', authController_1.authController.register);
     }
 }
 const authRoutes = new AuthRoutes();
