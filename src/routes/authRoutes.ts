@@ -10,6 +10,7 @@ class AuthRoutes{
 
     config(): void{
         this.router.post('/login', authController.login);
+        this.router.post('/refresh-token', authController.refreshToken);
         this.router.post('/register', authController.register);
     }
 }

@@ -9,6 +9,7 @@ class AuthRoutes {
     }
     config() {
         this.router.post('/login', authController_1.authController.login);
+        this.router.post('/refresh-token', authController_1.authController.refreshToken);
         this.router.post('/register', authController_1.authController.register);
     }
 }

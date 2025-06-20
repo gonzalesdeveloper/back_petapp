@@ -2,6 +2,9 @@ import express, { Application } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 
+/* middleware */
+import { verifyToken } from './middleware/auth.middleware';
+
 /* rutas */
 import petRoutes from './routes/petRoutes';
 import personaRoutes from './routes/personaRoutes';
@@ -40,6 +43,7 @@ export class Server{
 
     routes(): void{
         this.app.use('/api/auth', authRoutes);
+        this.app.use( verifyToken as express.RequestHandler);
         this.app.use('/api/pet', petRoutes);
         this.app.use('/api/person', personaRoutes);
         this.app.use('/api/tipoperson', tipopersonaRoutes);

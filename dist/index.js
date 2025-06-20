@@ -16,6 +16,8 @@ exports.Server = void 0;
 const express_1 = __importDefault(require("express"));
 const morgan_1 = __importDefault(require("morgan"));
 const cors_1 = __importDefault(require("cors"));
+/* middleware */
+const auth_middleware_1 = require("./middleware/auth.middleware");
 /* rutas */
 const petRoutes_1 = __importDefault(require("./routes/petRoutes"));
 const personaRoutes_1 = __importDefault(require("./routes/personaRoutes"));
@@ -51,6 +53,7 @@ class Server {
     }
     routes() {
         this.app.use('/api/auth', authRoutes_1.default);
+        this.app.use(auth_middleware_1.verifyToken);
         this.app.use('/api/pet', petRoutes_1.default);
         this.app.use('/api/person', personaRoutes_1.default);
         this.app.use('/api/tipoperson', tipopersonaRoutes_1.default);

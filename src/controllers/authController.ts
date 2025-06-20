@@ -3,13 +3,19 @@ import pool from "../database";
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
+import { generateAccessToken, generateRefreshToken } from '../utils/token.util';
+
 /* carga variable de entorno */
 import dotenv from 'dotenv';
 dotenv.config();
 
 const saltRounds = 10;
+const refresh = process.env.REFRESH_SECRET!;
+const access = process.env.ACCESS_SECRET!;
 
 class AuthController{
+
+    /* LOGIN NORMAL */
     public async login(req: Request, res: Response): Promise<any> {
         const { Email, Password } = req.body;
         
@@ -21,22 +27,30 @@ class AuthController{
           const user = rows[0];
           
           const match = await bcrypt.compare(Password, user.Password);
-          console.log(match);
-          
 
-          if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' })
+          if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
-          const token = jwt.sign({ IdPersona: user.IdPersona, Email: user.Email }, process.env.JWT_SECRET as string, {
+          const payload = { IdPersona: user.IdPersona, Email: user.Email };
+          const accessToken = generateAccessToken(payload);
+          const refreshToken = generateRefreshToken(payload);
+
+          res.json({
+            accessToken,
+            refreshToken
+          });
+
+          /* const token = jwt.sign({ IdPersona: user.IdPersona, Email: user.Email }, process.env.JWT_SECRET as string, {
             expiresIn: '2h'
           });  
     
-          res.json({ message: 'Login exitoso', token });
+          res.json({ message: 'Login exitoso', token }); */
     
         } catch (error) {
           res.status(500).json({ error: 'Error en el login' });
         }
     }
 
+    /* REGISTER NORMAL */
     public async register(req: Request, res: Response){
         const { IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Nacimiento, Email, Foto, Usuario, Password, Estado } = req.body;
         try {
@@ -55,6 +69,19 @@ class AuthController{
               error: 'Error al registrar usuario'
             });
         }
+    }
+
+    public async refreshToken(req: Request, res: Response){
+      // Ruta para refrescar token
+      const { refreshToken } = req.body;
+      try {
+        const payload: any = jwt.verify(refreshToken, refresh); // otro secreto
+        const newAccessToken = generateAccessToken({ IdPersona: payload.IdPersona, Email: payload.Email });
+        /* const newAccessToken = jwt.sign({ IdPersona: payload.IdPersona }, access, { expiresIn: '15m' }); */
+        res.json({ accessToken: newAccessToken });
+      } catch {
+        res.status(401).json({ error: 'Refresh token inválido o expirado' });
+      }
     }
 }
 
