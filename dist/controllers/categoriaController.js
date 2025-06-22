@@ -20,7 +20,7 @@ class CategoriaController {
             const list = yield database_1.default.query('SELECT * FROM CATEGORIAS');
             res.json({
                 data: list,
-                state: true,
+                status: true,
                 message: 'Todo Correcto'
             });
         });

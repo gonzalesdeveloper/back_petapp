@@ -20,7 +20,7 @@ class RazaController {
             const list = yield database_1.default.query('SELECT * FROM RAZA');
             res.json({
                 data: list,
-                state: true,
+                status: true,
                 message: 'Todo Correcto'
             });
         });

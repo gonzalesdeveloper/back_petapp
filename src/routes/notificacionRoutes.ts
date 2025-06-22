@@ -9,7 +9,7 @@ class NotificacionRoutes{
     }
 
     config():void{
-        this.router.get('/list', notificacionController.listNotificacion);
+        this.router.get('/list/:IdPersona', notificacionController.listNotificacion);
     }
 }
 

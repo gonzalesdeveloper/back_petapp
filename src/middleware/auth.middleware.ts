@@ -6,8 +6,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export function verifyToken(req: Request, res: Response, next: NextFunction) {
-    console.log(res.locals.user);
-    
     const token = req.headers['authorization'];
 
     if (!token) {

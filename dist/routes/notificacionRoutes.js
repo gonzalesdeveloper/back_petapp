@@ -8,7 +8,7 @@ class NotificacionRoutes {
         this.config();
     }
     config() {
-        this.router.get('/list', notificacionController_1.notificacionController.listNotificacion);
+        this.router.get('/list/:IdPersona', notificacionController_1.notificacionController.listNotificacion);
     }
 }
 const notificacionRoutes = new NotificacionRoutes();

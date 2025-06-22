@@ -6,7 +6,7 @@ class VetController{
         const list = await pool.query('SELECT * FROM VETERINARIA');
         res.json({
             data: list,
-            state: true,
+            status: true,
             message: 'Todo Correcto'
         });
     }

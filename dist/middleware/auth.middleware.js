@@ -9,7 +9,6 @@ const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 function verifyToken(req, res, next) {
-    console.log(res.locals.user);
     const token = req.headers['authorization'];
     if (!token) {
         return res.status(403).json({ message: 'Token requerido' });

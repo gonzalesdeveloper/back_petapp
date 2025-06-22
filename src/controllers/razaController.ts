@@ -8,7 +8,7 @@ class RazaController{
         const list = await pool.query('SELECT * FROM RAZA');
         res.json({
             data: list,
-            state: true,
+            status: true,
             message: 'Todo Correcto'
         });
     }

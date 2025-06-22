@@ -17,10 +17,11 @@ const database_1 = __importDefault(require("../database"));
 class NotificacionController {
     listNotificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const list = yield database_1.default.query('SELECT * FROM NOTIFICACION');
+            const { IdPersona } = req.params;
+            const list = yield database_1.default.query('SELECT * FROM NOTIFICACION WHERE IDPERSONA = ?', [IdPersona]);
             res.json({
                 data: list,
-                state: true,
+                status: true,
                 message: 'Todo Correcto'
             });
         });

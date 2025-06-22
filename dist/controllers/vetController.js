@@ -20,7 +20,7 @@ class VetController {
             const list = yield database_1.default.query('SELECT * FROM VETERINARIA');
             res.json({
                 data: list,
-                state: true,
+                status: true,
                 message: 'Todo Correcto'
             });
         });

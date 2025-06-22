@@ -53,6 +53,7 @@ class Server {
     }
     routes() {
         this.app.use('/api/auth', authRoutes_1.default);
+        /* verifica si el token existe o si ya venció */
         this.app.use(auth_middleware_1.verifyToken);
         this.app.use('/api/pet', petRoutes_1.default);
         this.app.use('/api/person', personaRoutes_1.default);

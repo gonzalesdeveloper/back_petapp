@@ -43,6 +43,7 @@ export class Server{
 
     routes(): void{
         this.app.use('/api/auth', authRoutes);
+        /* verifica si el token existe o si ya venció */
         this.app.use( verifyToken as express.RequestHandler);
         this.app.use('/api/pet', petRoutes);
         this.app.use('/api/person', personaRoutes);
