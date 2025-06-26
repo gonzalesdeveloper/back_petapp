@@ -11,7 +11,7 @@ class PersonaRoutes{
 
     config(): void{
         this.router.get('/list', personaController.getPerson);
-        this.router.get('/listtypeperson/:id', personaController.getTypePerson);
+        this.router.get('/listtypeperson/:IdPersona', personaController.getOnePerson);
     }
 }
 

@@ -9,7 +9,7 @@ class PersonaRoutes {
     }
     config() {
         this.router.get('/list', personaController_1.personaController.getPerson);
-        this.router.get('/listtypeperson/:id', personaController_1.personaController.getTypePerson);
+        this.router.get('/listtypeperson/:IdPersona', personaController_1.personaController.getOnePerson);
     }
 }
 const personaRoutes = new PersonaRoutes();

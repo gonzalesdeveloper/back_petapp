@@ -11,10 +11,9 @@ class PersonaController{
         });
     }
 
-    async getTypePerson(req: Request, res: Response){
-        const { id } = req.params; 
-        console.log(id)
-        const list = await pool.query('SELECT * FROM PERSONA WHERE IDTIPOPERSONA = ?' , [id]);
+    async getOnePerson(req: Request, res: Response){
+        const { IdPersona } = req.params;        
+        const list = await pool.query('SELECT * FROM PERSONA WHERE IDPERSONA = ?' , [IdPersona]);
         res.json({
             data: list,
             status: true,
