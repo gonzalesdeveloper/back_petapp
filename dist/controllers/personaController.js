@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.personaController = void 0;
 const database_1 = __importDefault(require("../database"));
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const saltRounds = 10;
 class PersonaController {
     getPerson(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29,11 +31,33 @@ class PersonaController {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
             const list = yield database_1.default.query('SELECT * FROM PERSONA WHERE IDPERSONA = ?', [IdPersona]);
+            list[0].Password = '';
             res.json({
                 data: list,
                 status: true,
                 message: 'Todo correcto'
             });
+        });
+    }
+    /* editar persona */
+    editPerson(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdPersona } = req.params;
+            try {
+                if (req.body.password) {
+                    req.body.password = yield bcrypt_1.default.hash(req.body.password, saltRounds);
+                }
+                yield database_1.default.query('UPDATE PERSONA SET ? WHERE IDPERSONA = ?', [req.body, IdPersona]);
+                res.status(201).json({
+                    message: 'Usuario Actualizado',
+                    /* data: [] */
+                });
+            }
+            catch (error) {
+                res.status(500).json({
+                    error: 'Error al Actualizar Usuario'
+                });
+            }
         });
     }
 }

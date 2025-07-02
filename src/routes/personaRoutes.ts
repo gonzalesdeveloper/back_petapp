@@ -12,6 +12,7 @@ class PersonaRoutes{
     config(): void{
         this.router.get('/list', personaController.getPerson);
         this.router.get('/listtypeperson/:IdPersona', personaController.getOnePerson);
+        this.router.put('/update/:IdPersona', personaController.editPerson)
     }
 }
 
