@@ -18,6 +18,9 @@ class PersonaController{
         const { IdPersona } = req.params;        
         const list = await pool.query('SELECT * FROM PERSONA WHERE IDPERSONA = ?' , [IdPersona]);
         list[0].Password = '';
+        const fecha = new Date(list[0].Nacimiento);
+        const fechaFormateada = fecha.toISOString().split('T')[0];
+        list[0].Nacimiento = fechaFormateada;
         
         res.json({
             data: list,
