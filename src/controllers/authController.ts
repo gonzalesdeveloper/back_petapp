@@ -35,6 +35,7 @@ class AuthController{
           const refreshToken = generateRefreshToken(payload);
 
           res.json({
+            message: 'Logeo exitoso',
             accessToken,
             refreshToken
           });

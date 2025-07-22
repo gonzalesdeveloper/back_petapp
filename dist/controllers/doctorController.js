@@ -17,7 +17,13 @@ const database_1 = __importDefault(require("../database"));
 class DoctorController {
     getDoctors(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const list = yield database_1.default.query('SELECT * FROM DOCTOR, PERSONA');
+            const list = yield database_1.default.query('SELECT p.Nombres, p.Apellidos, p.Direccion, d.Rating from PERSONA p JOIN DOCTOR d ON p.IdPersona = d.IdPersona');
+            console.log(list);
+            res.json({
+                message: 'Todo Correcto',
+                status: true,
+                data: list
+            });
         });
     }
 }

@@ -19,6 +19,7 @@ import tipoMascotaRoutes from './routes/tipoMascotaRoutes';
 import eventoRoutes from './routes/eventoRoutes';
 import blogRoutes from './routes/blogRoutes';
 import authRoutes from './routes/authRoutes';
+import doctorRoutes from './routes/doctorRoutes';
 
 export class Server{
     public app: Application;
@@ -57,6 +58,7 @@ export class Server{
         this.app.use('/api/tipomascota', tipoMascotaRoutes);
         this.app.use('/api/evento', eventoRoutes);
         this.app.use('/api/blog', blogRoutes);
+        this.app.use('/api/doctor', doctorRoutes);
     }
 
     start(): void{

@@ -32,6 +32,7 @@ const tipoMascotaRoutes_1 = __importDefault(require("./routes/tipoMascotaRoutes"
 const eventoRoutes_1 = __importDefault(require("./routes/eventoRoutes"));
 const blogRoutes_1 = __importDefault(require("./routes/blogRoutes"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
+const doctorRoutes_1 = __importDefault(require("./routes/doctorRoutes"));
 class Server {
     constructor() {
         this.app = (0, express_1.default)();
@@ -67,6 +68,7 @@ class Server {
         this.app.use('/api/tipomascota', tipoMascotaRoutes_1.default);
         this.app.use('/api/evento', eventoRoutes_1.default);
         this.app.use('/api/blog', blogRoutes_1.default);
+        this.app.use('/api/doctor', doctorRoutes_1.default);
     }
     start() {
         this.app.listen(this.app.get('port'), () => {
