@@ -3,7 +3,8 @@ import pool from "../database";
 
 class DoctorController{
     async getDoctors(req: Request, res: Response){
-        const list = await pool.query('SELECT p.Nombres, p.Apellidos, p.Direccion, p.Foto, d.Rating from PERSONA p JOIN DOCTOR d ON p.IdPersona = d.IdPersona');
+        const { IdPersona } = req.params;         
+        const list = await pool.query('SELECT d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Foto, d.Rating, CASE WHEN df.IdPersona IS NULL THEN false ELSE true END AS IsFavourite FROM doctor d INNER JOIN persona p ON d.IdPersona = p.IdPersona LEFT JOIN favdoc df ON d.IdDoctor = df.IdDoctor AND df.IdPersona = ?', [IdPersona]);
         res.json({
             message: 'Todo Correcto',
             status: true,

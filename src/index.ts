@@ -20,6 +20,8 @@ import eventoRoutes from './routes/eventoRoutes';
 import blogRoutes from './routes/blogRoutes';
 import authRoutes from './routes/authRoutes';
 import doctorRoutes from './routes/doctorRoutes';
+import especialidadRouter from './routes/especialidadRouter';
+import doctorespecialidadRoutes from './routes/doctorespecialidadRoutes';
 
 export class Server{
     public app: Application;
@@ -59,11 +61,13 @@ export class Server{
         this.app.use('/api/evento', eventoRoutes);
         this.app.use('/api/blog', blogRoutes);
         this.app.use('/api/doctor', doctorRoutes);
+        this.app.use('/api/especialidad', especialidadRouter);
+        this.app.use('/api/docesp', doctorespecialidadRoutes);
     }
 
     start(): void{
         this.app.listen(this.app.get('port'), ()=>{
-            console.log("puerto corriendo en " , this.app.get('port'));            
+            console.log("puerto corriendo en " , this.app.get('port'));
         });
     }
 }

@@ -8,7 +8,7 @@ class DoctorRoutes {
         this.config();
     }
     config() {
-        this.router.get('/list', doctorController_1.doctorController.getDoctors);
+        this.router.get('/list/:IdPersona', doctorController_1.doctorController.getDoctors);
     }
 }
 const doctorRoutes = new DoctorRoutes();
