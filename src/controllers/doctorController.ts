@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { json, Request, Response } from "express";
 import pool from "../database";
 
 class DoctorController{
@@ -10,6 +10,36 @@ class DoctorController{
             status: true,
             data: list
         });
+    }
+
+    async doctorFavorito(req: Request, res: Response): Promise<any> {
+        const { IdPersona, IdDoctor } = req.body;
+        if( !IdPersona || !IdDoctor){
+            return res.status(400).json({ status: false, message: 'Se requiere los IDs correspondientes'});
+        }
+        try{
+            const rows: any[] = await pool.query('SELECT * FROM favdoc where IdPersona = ? and IdDoctor = ?', [IdPersona, IdDoctor]);
+            if ( rows.length > 0){
+                await pool.query('DELETE FROM favdoc where IdPersona = ? and IdDoctor = ?', [IdPersona, IdDoctor]);
+                return res.json({
+                    message: 'Elimado Correctamente',
+                    status: true
+                })
+            }else{
+                await pool.query('INSERT INTO FAVDOC (IdPersona, IdDoctor) values (?,?)', [IdPersona, IdDoctor]);
+                return res.json({
+                    message: 'Marcado Favorito',
+                    status: true
+                })
+            }
+        }catch(error: any){
+            console.error('Error en doctorFavorito:', error);
+            return res.status(500).json({
+                status: false,
+                message: 'Error en el servidor',
+                error: error.message, // 🟧 Añade mensaje para depurar
+            });
+        }
     }
 }
 

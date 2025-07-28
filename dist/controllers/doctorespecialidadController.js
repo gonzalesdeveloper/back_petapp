@@ -18,7 +18,6 @@ class DoctorEspecialidadController {
     listDoctorEspecialidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdDoctor } = req.params;
-            console.log(IdDoctor);
             const list = yield database_1.default.query('SELECT d.IdDoctor, e.Descripcion, e.Lugar_Estudios, e.Icono from Doctor d INNER JOIN doctor_especialidad de ON d.IdDoctor = de.IdDoctor INNER JOIN Especialidad e ON de.IdEspecialidad = e.IdEspecialidad WHERE d.IdDoctor = ?', [IdDoctor]);
             res.json({
                 message: 'Todo ok',

@@ -9,6 +9,7 @@ class DoctorRoutes {
     }
     config() {
         this.router.get('/list/:IdPersona', doctorController_1.doctorController.getDoctors);
+        this.router.post('/fav', doctorController_1.doctorController.doctorFavorito);
     }
 }
 const doctorRoutes = new DoctorRoutes();

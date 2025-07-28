@@ -2,7 +2,7 @@ import { Router } from "express"
 import { doctorController } from "../controllers/doctorController";
 
 class DoctorRoutes{
-    router: Router = Router();
+    public router: Router = Router();
 
     constructor(){
         this.config();
@@ -10,8 +10,9 @@ class DoctorRoutes{
 
     config(): void{
         this.router.get('/list/:IdPersona', doctorController.getDoctors);
+        this.router.post('/fav', doctorController.doctorFavorito);
     }
-}
+} 
 
 const doctorRoutes = new DoctorRoutes();
 export default doctorRoutes.router;

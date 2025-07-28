@@ -26,5 +26,38 @@ class DoctorController {
             });
         });
     }
+    doctorFavorito(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdPersona, IdDoctor } = req.body;
+            if (!IdPersona || !IdDoctor) {
+                return res.status(400).json({ status: false, message: 'Se requiere los IDs correspondientes' });
+            }
+            try {
+                const rows = yield database_1.default.query('SELECT * FROM favdoc where IdPersona = ? and IdDoctor = ?', [IdPersona, IdDoctor]);
+                if (rows.length > 0) {
+                    yield database_1.default.query('DELETE FROM favdoc where IdPersona = ? and IdDoctor = ?', [IdPersona, IdDoctor]);
+                    return res.json({
+                        message: 'Elimado Correctamente',
+                        status: true
+                    });
+                }
+                else {
+                    yield database_1.default.query('INSERT INTO FAVDOC (IdPersona, IdDoctor) values (?,?)', [IdPersona, IdDoctor]);
+                    return res.json({
+                        message: 'Marcado Favorito',
+                        status: true
+                    });
+                }
+            }
+            catch (error) {
+                console.error('Error en doctorFavorito:', error);
+                return res.status(500).json({
+                    status: false,
+                    message: 'Error en el servidor',
+                    error: error.message, // 🟧 Añade mensaje para depurar
+                });
+            }
+        });
+    }
 }
 exports.doctorController = new DoctorController();
