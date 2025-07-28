@@ -2,9 +2,19 @@ import { json, Request, Response } from "express";
 import pool from "../database";
 
 class DoctorController{
-    async getDoctors(req: Request, res: Response){
+    async getDoctorsHome(req: Request, res: Response){
         const { IdPersona } = req.params;         
-        const list = await pool.query('SELECT d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Foto, d.Rating, CASE WHEN df.IdPersona IS NULL THEN false ELSE true END AS IsFavourite FROM doctor d INNER JOIN persona p ON d.IdPersona = p.IdPersona LEFT JOIN favdoc df ON d.IdDoctor = df.IdDoctor AND df.IdPersona = ?', [IdPersona]);
+        const list = await pool.query('SELECT d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Referencia, p.Foto, d.Presentacion, d.Rating, CASE WHEN df.IdPersona IS NULL THEN false ELSE true END AS IsFavourite FROM doctor d INNER JOIN persona p ON d.IdPersona = p.IdPersona LEFT JOIN favdoc df ON d.IdDoctor = df.IdDoctor AND df.IdPersona = ?', [IdPersona]);
+        res.json({
+            message: 'Todo Correcto',
+            status: true,
+            data: list
+        });
+    }
+
+    async getDetailDoctor(req: Request, res: Response){
+        const { IdDoctor } = req.params;
+        const list = await pool.query('SELECT p.IdPersona, d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Foto, p.Referencia, d.Rating, d.Presentacion FROM `persona` p inner join doctor d on p.IdPersona = d.IdPersona WHERE d.IdDoctor = ?', [IdDoctor]);
         res.json({
             message: 'Todo Correcto',
             status: true,

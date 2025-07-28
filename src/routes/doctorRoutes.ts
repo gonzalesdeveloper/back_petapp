@@ -9,8 +9,9 @@ class DoctorRoutes{
     }
 
     config(): void{
-        this.router.get('/list/:IdPersona', doctorController.getDoctors);
+        this.router.get('/list/:IdPersona', doctorController.getDoctorsHome);
         this.router.post('/fav', doctorController.doctorFavorito);
+        this.router.get('/detail/:IdDoctor', doctorController.getDetailDoctor);
     }
 } 
 
