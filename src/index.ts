@@ -22,6 +22,7 @@ import authRoutes from './routes/authRoutes';
 import doctorRoutes from './routes/doctorRoutes';
 import especialidadRouter from './routes/especialidadRouter';
 import doctorespecialidadRoutes from './routes/doctorespecialidadRoutes';
+import comentarioRoutes from './routes/comentarioRoutes';
 
 export class Server{
     public app: Application;
@@ -63,6 +64,7 @@ export class Server{
         this.app.use('/api/doctor', doctorRoutes);
         this.app.use('/api/especialidad', especialidadRouter);
         this.app.use('/api/docesp', doctorespecialidadRoutes);
+        this.app.use('/api/comentario', comentarioRoutes);
     }
 
     start(): void{
