@@ -9,6 +9,7 @@ class ComentarioRoutes{
 
     config():void{
         this.router.get('/list/:IdDoctor', comentarioController.getComentarioDoctor);
+        this.router.post('/create', comentarioController.createComentarioDoctor);
     }
 }
 

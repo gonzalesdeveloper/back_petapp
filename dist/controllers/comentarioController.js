@@ -26,5 +26,15 @@ class ComentarioController {
             });
         });
     }
+    createComentarioDoctor(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdPersona, Titulo, Descripcion, Rating, comentable_id, comentable_typo } = req.body;
+            yield database_1.default.query('INSERT INTO COMENTARIO (IdPersona, Titulo, Descripcion, Rating, Fecha, comentable_id, comentable_typo, Estado) VALUES (?,?,?,?,NOW(),?,?,1)', [IdPersona, Titulo, Descripcion, Rating, comentable_id, comentable_typo]);
+            res.json({
+                message: 'Creado Correctamente',
+                status: true,
+            });
+        });
+    }
 }
 exports.comentarioController = new ComentarioController();

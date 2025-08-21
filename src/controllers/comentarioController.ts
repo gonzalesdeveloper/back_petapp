@@ -11,6 +11,19 @@ class ComentarioController{
             data: list
         });
     }
+
+    async createComentarioDoctor(req: Request, res: Response){
+        const { IdPersona, Titulo, Descripcion, Rating, comentable_id, comentable_typo } = req.body;
+
+
+        await pool.query('INSERT INTO COMENTARIO (IdPersona, Titulo, Descripcion, Rating, Fecha, comentable_id, comentable_typo, Estado) VALUES (?,?,?,?,NOW(),?,?,1)', 
+        [IdPersona, Titulo, Descripcion, Rating, comentable_id, comentable_typo]);
+
+        res.json({
+            message: 'Creado Correctamente',
+            status: true,
+        });
+    }
 }
 
 export const comentarioController = new ComentarioController();
