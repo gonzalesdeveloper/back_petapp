@@ -8,7 +8,7 @@ class PetRoutes {
         this.config();
     }
     config() {
-        this.routes.get('/list', petController_1.petController.listPet);
+        this.routes.get('/list', petController_1.petController.listPetLost);
     }
 }
 const petRoutes = new PetRoutes();

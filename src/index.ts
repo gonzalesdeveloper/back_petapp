@@ -23,6 +23,7 @@ import doctorRoutes from './routes/doctorRoutes';
 import especialidadRouter from './routes/especialidadRouter';
 import doctorespecialidadRoutes from './routes/doctorespecialidadRoutes';
 import comentarioRoutes from './routes/comentarioRoutes';
+import doctorFavRoutes from './routes/doctorFavRoutes';
 
 export class Server{
     public app: Application;
@@ -65,6 +66,7 @@ export class Server{
         this.app.use('/api/especialidad', especialidadRouter);
         this.app.use('/api/docesp', doctorespecialidadRoutes);
         this.app.use('/api/comentario', comentarioRoutes);
+        this.app.use('/api/favdoc', doctorFavRoutes);
     }
 
     start(): void{

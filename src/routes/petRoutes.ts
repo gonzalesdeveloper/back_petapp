@@ -9,7 +9,7 @@ class PetRoutes{
     }
 
     config(): void{
-        this.routes.get('/list', petController.listPet)
+        this.routes.get('/list', petController.listPetLost)
     }
 }
 

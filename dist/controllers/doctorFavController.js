@@ -12,23 +12,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.petController = void 0;
+exports.doctorFavController = void 0;
 const database_1 = __importDefault(require("../database"));
-class PetController {
-    listPetLost(req, res) {
+class DoctorFavController {
+    listDoctorFav(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const list = yield database_1.default.query("SELECT p.IdPet, p.Nombre, p.Apellidos, tm.Descripcion as Tipo, r.Descripcion as Raza, c.Descripcion as Color, p.Edad, p.Peso, p.Medida, p.Foto, p.Detalle, mp.Descripcion, mp.Lugar_Perdida, mp.Ciudad, mp.Fecha_Perdida, mp.Numero_Contacto, mp.Referencia FROM PET p INNER JOIN MASCOTA_PERDIDA mp ON p.IdPet = mp.IdPet INNER JOIN  TIPOMASCOTA tm ON p.IdTipoMascota = tm.IdTipoMascota INNER JOIN Raza r ON p.IdRaza = r.IdRaza INNER JOIN Color c ON p.IdColor = c.IdColor WHERE p.Tipo = 'perdida'");
-            for (let index = 0; index < list.length; index++) {
-                const fecha = new Date(list[index].Fecha_Perdida);
-                const fechaFormateada = fecha.toISOString().split('T')[0];
-                list[0].Fecha_Perdida = fechaFormateada;
-            }
+            const { IdDoctor } = req.params;
+            const list = yield database_1.default.query('SELECT d.IdDoctor, d.Presentacion, d.Foto, d.Rating from Doctor d INNER JOIN favdoc fav ON d.IdDoctor = fav.IdDoctor INNER JOIN Persona p ON fav.IdPersona = p.IdPersona WHERE d.IdDoctor = ?', [IdDoctor]);
             res.json({
-                data: list,
                 status: true,
-                message: "Listo Correcto"
+                message: 'Todo correcto',
+                data: list
             });
         });
     }
 }
-exports.petController = new PetController();
+exports.doctorFavController = new DoctorFavController();
