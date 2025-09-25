@@ -8,7 +8,7 @@ class DoctorFavRoutes {
         this.config();
     }
     config() {
-        this.router.get('/list', doctorFavController_1.doctorFavController.listDoctorFav);
+        this.router.get('/list/:IdPersona', doctorFavController_1.doctorFavController.listDoctorFav);
     }
 }
 const doctorFavRoutes = new DoctorFavRoutes();

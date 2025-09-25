@@ -9,7 +9,7 @@ class DoctorFavRoutes{
     }
 
     config(): void{
-        this.router.get('/list', doctorFavController.listDoctorFav);
+        this.router.get('/list/:IdPersona', doctorFavController.listDoctorFav);
     }
 }
 
