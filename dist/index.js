@@ -37,6 +37,7 @@ const especialidadRouter_1 = __importDefault(require("./routes/especialidadRoute
 const doctorespecialidadRoutes_1 = __importDefault(require("./routes/doctorespecialidadRoutes"));
 const comentarioRoutes_1 = __importDefault(require("./routes/comentarioRoutes"));
 const doctorFavRoutes_1 = __importDefault(require("./routes/doctorFavRoutes"));
+const petFavRoutes_1 = __importDefault(require("./routes/petFavRoutes"));
 class Server {
     constructor() {
         this.app = (0, express_1.default)();
@@ -77,6 +78,7 @@ class Server {
         this.app.use('/api/docesp', doctorespecialidadRoutes_1.default);
         this.app.use('/api/comentario', comentarioRoutes_1.default);
         this.app.use('/api/favdoc', doctorFavRoutes_1.default);
+        this.app.use('/api/favpet', petFavRoutes_1.default);
     }
     start() {
         this.app.listen(this.app.get('port'), () => {
