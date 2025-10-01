@@ -58,13 +58,12 @@ class AuthController {
     /* REGISTER NORMAL */
     register(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Nacimiento, Email, Foto, Usuario, Password, Estado } = req.body;
+            const { IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, Password, Estado } = req.body;
             try {
                 const hashedPassword = yield bcrypt_1.default.hash(Password, saltRounds);
-                yield database_1.default.query('INSERT INTO PERSONA (IDTIPOPERSONA, IDTIPODOCUMENTO, NUMDOCUMENTO, NOMBRES, APELLIDOS, DIRECCION, REFERENCIA, NACIMIENTO, EMAIL, FOTO, USUARIO, PASSWORD, ESTADO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Nacimiento, Email, Foto, Usuario, hashedPassword, Estado]);
+                yield database_1.default.query('INSERT INTO PERSONA (IDTIPOPERSONA, IDTIPODOCUMENTO, NUMDOCUMENTO, NOMBRES, APELLIDOS, DIRECCION, REFERENCIA, CIUDAD, NACIMIENTO, EMAIL, FOTO, USUARIO, PASSWORD, ESTADO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, hashedPassword, Estado]);
                 res.status(201).json({
                     message: 'Usuario registrado',
-                    /* data: [] */
                 });
             }
             catch (error) {
