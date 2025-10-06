@@ -4,7 +4,7 @@ import pool from "../database";
 class ComentarioController{
     async getComentarioDoctor(req: Request, res: Response){
         const { IdDoctor } = req.params;
-        const list = await pool.query('SELECT * FROM COMENTARIO WHERE comentable_typo = ? AND comentable_id = ?', ['doctor', IdDoctor]);
+        const list = await pool.query('SELECT c.IdComentario, c.IdPersona, p.Foto, c.Titulo, c.Descripcion, c.Rating, c.Fecha, c.comentable_id, c.comentable_typo, c.Estado FROM comentario c INNER JOIN Persona p ON c.IdPersona = p.IdPersona WHERE comentable_typo = ? AND comentable_id = ?', ['doctor', IdDoctor]);
         res.json({
             message: 'Todo Correcto',
             status: true,
