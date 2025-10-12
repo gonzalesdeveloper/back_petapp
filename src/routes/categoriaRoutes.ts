@@ -10,6 +10,7 @@ class CategoriaRoutes{
 
     config(): void{
         this.router.get('/list', categoriaController.listCategoria);
+        this.router.get('/listimportant', categoriaController.listCategoriaImportant);
     }
 }
 

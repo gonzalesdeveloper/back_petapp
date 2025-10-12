@@ -9,6 +9,7 @@ class CategoriaRoutes {
     }
     config() {
         this.router.get('/list', categoriaController_1.categoriaController.listCategoria);
+        this.router.get('/listimportant', categoriaController_1.categoriaController.listCategoriaImportant);
     }
 }
 const categoriaRoutes = new CategoriaRoutes();
