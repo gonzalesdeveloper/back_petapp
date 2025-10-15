@@ -18,7 +18,7 @@ class ComentarioController {
     getComentarioDoctor(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdDoctor } = req.params;
-            const list = yield database_1.default.query('SELECT c.IdComentario, c.IdPersona, p.Foto, c.Titulo, c.Descripcion, c.Rating, c.Fecha, c.comentable_id, c.comentable_typo, c.Estado FROM comentario c INNER JOIN Persona p ON c.IdPersona = p.IdPersona WHERE comentable_typo = ? AND comentable_id = ?', ['doctor', IdDoctor]);
+            const [list] = yield database_1.default.query('SELECT c.IdComentario, c.IdPersona, p.Foto, c.Titulo, c.Descripcion, c.Rating, c.Fecha, c.comentable_id, c.comentable_typo, c.Estado FROM comentario c INNER JOIN persona p ON c.IdPersona = p.IdPersona WHERE comentable_typo = ? AND comentable_id = ?', ['doctor', IdDoctor]);
             res.json({
                 message: 'Todo Correcto',
                 status: true,
@@ -29,7 +29,7 @@ class ComentarioController {
     createComentarioDoctor(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona, Titulo, Descripcion, Rating, comentable_id, comentable_typo } = req.body;
-            yield database_1.default.query('INSERT INTO COMENTARIO (IdPersona, Titulo, Descripcion, Rating, Fecha, comentable_id, comentable_typo, Estado) VALUES (?,?,?,?,NOW(),?,?,1)', [IdPersona, Titulo, Descripcion, Rating, comentable_id, comentable_typo]);
+            yield database_1.default.query('INSERT INTO comentario (IdPersona, Titulo, Descripcion, Rating, Fecha, comentable_id, comentable_typo, Estado) VALUES (?,?,?,?,NOW(),?,?,1)', [IdPersona, Titulo, Descripcion, Rating, comentable_id, comentable_typo]);
             res.json({
                 message: 'Creado Correctamente',
                 status: true,

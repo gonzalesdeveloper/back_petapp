@@ -19,7 +19,7 @@ const saltRounds = 10;
 class PersonaController {
     getPerson(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const list = yield database_1.default.query("SELECT * FROM PERSONA");
+            const [list] = yield database_1.default.query("SELECT * FROM persona");
             res.json({
                 data: list,
                 status: true,
@@ -30,7 +30,7 @@ class PersonaController {
     getOnePerson(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
-            const list = yield database_1.default.query('SELECT * FROM PERSONA WHERE IDPERSONA = ?', [IdPersona]);
+            const [list] = yield database_1.default.query('SELECT * FROM persona WHERE IdPersona = ?', [IdPersona]);
             list[0].Password = '';
             const fecha = new Date(list[0].Nacimiento);
             const fechaFormateada = fecha.toISOString().split('T')[0];
@@ -50,7 +50,7 @@ class PersonaController {
                 if (req.body.password) {
                     req.body.password = yield bcrypt_1.default.hash(req.body.password, saltRounds);
                 }
-                yield database_1.default.query('UPDATE PERSONA SET ? WHERE IDPERSONA = ?', [req.body, IdPersona]);
+                yield database_1.default.query('UPDATE persona SET ? WHERE IDPERSONA = ?', [req.body, IdPersona]);
                 res.status(201).json({
                     message: 'Usuario Actualizado',
                     /* data: [] */

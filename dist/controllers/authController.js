@@ -29,7 +29,7 @@ class AuthController {
         return __awaiter(this, void 0, void 0, function* () {
             const { Email, Password } = req.body;
             try {
-                const rows = yield database_1.default.query('SELECT * FROM PERSONA WHERE Email = ?', [Email]);
+                const [rows] = yield database_1.default.query('SELECT * FROM persona WHERE Email = ?', [Email]);
                 if (rows.length === 0)
                     return res.status(401).json({ error: 'Usuario no encontrado' });
                 const user = rows[0];
@@ -51,6 +51,7 @@ class AuthController {
                 res.json({ message: 'Login exitoso', token }); */
             }
             catch (error) {
+                console.log(error);
                 res.status(500).json({ error: 'Error en el login' });
             }
         });
@@ -61,7 +62,7 @@ class AuthController {
             const { IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, Password, Estado } = req.body;
             try {
                 const hashedPassword = yield bcrypt_1.default.hash(Password, saltRounds);
-                yield database_1.default.query('INSERT INTO PERSONA (IDTIPOPERSONA, IDTIPODOCUMENTO, NUMDOCUMENTO, NOMBRES, APELLIDOS, DIRECCION, REFERENCIA, CIUDAD, NACIMIENTO, EMAIL, FOTO, USUARIO, PASSWORD, ESTADO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, hashedPassword, Estado]);
+                yield database_1.default.query('INSERT INTO persona (IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, Password, Estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)', [IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, hashedPassword, Estado]);
                 res.status(201).json({
                     message: 'Usuario registrado',
                 });

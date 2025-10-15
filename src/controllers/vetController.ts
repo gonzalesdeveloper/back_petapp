@@ -3,7 +3,7 @@ import pool from "../database";
 
 class VetController{
     public async listVet(req: Request, res: Response){
-        const list = await pool.query('SELECT * FROM VETERINARIA');
+        const [list] = await pool.query('SELECT * FROM veterinaria');
         res.json({
             data: list,
             status: true,

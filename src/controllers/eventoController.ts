@@ -3,7 +3,7 @@ import pool from "../database";
 
 class EventoController{
     public async listEvento(req: Request, res: Response){
-        const list = await pool.query('SELECT * FROM EVENTO');
+        const [list] = await pool.query('SELECT * FROM evento');
         res.json({
             data: list,
             status: true,

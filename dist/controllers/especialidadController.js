@@ -17,7 +17,7 @@ const database_1 = __importDefault(require("../database"));
 class EspecialidadController {
     listEspecialidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const list = database_1.default.query('SELECT * FROM ESPECIALIDAD');
+            const [list] = yield database_1.default.query('SELECT * FROM especialidad');
             res.json({
                 message: 'Todo Ok',
                 status: true,

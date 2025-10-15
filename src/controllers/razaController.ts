@@ -5,7 +5,7 @@ import pool from "../database";
 class RazaController{
 
     public async listRaza(req: Request, res: Response){
-        const list = await pool.query('SELECT * FROM RAZA');
+        const [list] = await pool.query('SELECT * FROM raza');
         res.json({
             data: list,
             status: true,

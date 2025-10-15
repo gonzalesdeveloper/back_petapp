@@ -18,7 +18,7 @@ class DoctorController {
     getDoctorsHome(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
-            const list = yield database_1.default.query('SELECT d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Referencia, p.Foto, d.Presentacion, d.Rating, CASE WHEN df.IdPersona IS NULL THEN false ELSE true END AS IsFavourite FROM doctor d INNER JOIN persona p ON d.IdPersona = p.IdPersona LEFT JOIN favdoc df ON d.IdDoctor = df.IdDoctor AND df.IdPersona = ?', [IdPersona]);
+            const [list] = yield database_1.default.query('SELECT d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Referencia, p.Foto, d.Presentacion, d.Rating, CASE WHEN df.IdPersona IS NULL THEN false ELSE true END AS IsFavourite FROM doctor d INNER JOIN persona p ON d.IdPersona = p.IdPersona LEFT JOIN favdoc df ON d.IdDoctor = df.IdDoctor AND df.IdPersona = ?', [IdPersona]);
             res.json({
                 message: 'Todo Correcto',
                 status: true,
@@ -29,7 +29,7 @@ class DoctorController {
     getDetailDoctor(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdDoctor } = req.params;
-            const list = yield database_1.default.query('SELECT p.IdPersona, d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Foto, p.Referencia, d.Rating, d.Presentacion FROM `persona` p inner join doctor d on p.IdPersona = d.IdPersona WHERE d.IdDoctor = ?', [IdDoctor]);
+            const [list] = yield database_1.default.query('SELECT p.IdPersona, d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Foto, p.Referencia, d.Rating, d.Presentacion FROM `persona` p inner join doctor d on p.IdPersona = d.IdPersona WHERE d.IdDoctor = ?', [IdDoctor]);
             res.json({
                 message: 'Todo Correcto',
                 status: true,
@@ -44,7 +44,7 @@ class DoctorController {
                 return res.status(400).json({ status: false, message: 'Se requiere los IDs correspondientes' });
             }
             try {
-                const rows = yield database_1.default.query('SELECT * FROM favdoc where IdPersona = ? and IdDoctor = ?', [IdPersona, IdDoctor]);
+                const [rows] = yield database_1.default.query('SELECT * FROM favdoc where IdPersona = ? and IdDoctor = ?', [IdPersona, IdDoctor]);
                 if (rows.length > 0) {
                     yield database_1.default.query('DELETE FROM favdoc where IdPersona = ? and IdDoctor = ?', [IdPersona, IdDoctor]);
                     return res.json({
@@ -53,7 +53,7 @@ class DoctorController {
                     });
                 }
                 else {
-                    yield database_1.default.query('INSERT INTO FAVDOC (IdPersona, IdDoctor) values (?,?)', [IdPersona, IdDoctor]);
+                    yield database_1.default.query('INSERT INTO favdoc (IdPersona, IdDoctor) values (?,?)', [IdPersona, IdDoctor]);
                     return res.json({
                         message: 'Marcado Favorito',
                         status: true

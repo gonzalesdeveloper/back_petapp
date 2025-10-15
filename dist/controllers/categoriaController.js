@@ -17,7 +17,7 @@ const database_1 = __importDefault(require("../database"));
 class CategoriaController {
     listCategoria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const list = yield database_1.default.query('SELECT * FROM CATEGORIAS');
+            const [list] = yield database_1.default.query('SELECT * FROM categorias');
             res.json({
                 data: list,
                 status: true,
@@ -27,7 +27,7 @@ class CategoriaController {
     }
     listCategoriaImportant(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const list = yield database_1.default.query('SELECT * FROM CATEGORIAS WHERE IMPORTANCIA = 1');
+            const [list] = yield database_1.default.query('SELECT * FROM categorias WHERE IMPORTANCIA = 1');
             res.json({
                 data: list,
                 status: true,

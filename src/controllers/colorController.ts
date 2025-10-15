@@ -3,7 +3,7 @@ import pool from "../database";
 
 class ColorController{
     public async listColor(req: Request, res: Response){
-        const list = await pool.query('SELECT * FROM COLOR');
+        const [list] = await pool.query('SELECT * FROM color');
         res.json({
             data: list,
             status: true,

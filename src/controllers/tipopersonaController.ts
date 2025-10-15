@@ -3,7 +3,7 @@ import pool from "../database";
 
 class TipoPersonaController{
     async getTipoPersona(req: Request, res: Response){
-        const list = await pool.query("SELECT * FROM TIPOPERSONA");
+        const [list] = await pool.query("SELECT * FROM tipopersona");
         res.json({
             data: list,
             status: true,

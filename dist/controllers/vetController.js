@@ -17,7 +17,7 @@ const database_1 = __importDefault(require("../database"));
 class VetController {
     listVet(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const list = yield database_1.default.query('SELECT * FROM VETERINARIA');
+            const [list] = yield database_1.default.query('SELECT * FROM veterinaria');
             res.json({
                 data: list,
                 status: true,

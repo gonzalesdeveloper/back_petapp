@@ -20,7 +20,8 @@ class AuthController{
         const { Email, Password } = req.body;
         
         try {
-          const rows: any[] = await pool.query('SELECT * FROM PERSONA WHERE Email = ?', [Email]);
+          
+          const [rows]: any = await pool.query('SELECT * FROM persona WHERE Email = ?', [Email]);
 
           if (rows.length === 0) return res.status(401).json({ error: 'Usuario no encontrado' });
     
@@ -47,6 +48,8 @@ class AuthController{
           res.json({ message: 'Login exitoso', token }); */
     
         } catch (error) {
+          console.log(error);
+          
           res.status(500).json({ error: 'Error en el login' });
         }
     }
@@ -59,7 +62,7 @@ class AuthController{
             const hashedPassword = await bcrypt.hash(Password, saltRounds);
 
             await pool.query(
-            'INSERT INTO PERSONA (IDTIPOPERSONA, IDTIPODOCUMENTO, NUMDOCUMENTO, NOMBRES, APELLIDOS, DIRECCION, REFERENCIA, CIUDAD, NACIMIENTO, EMAIL, FOTO, USUARIO, PASSWORD, ESTADO) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO persona (IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, Password, Estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, hashedPassword, Estado]
             );
             res.status(201).json({ 

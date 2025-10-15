@@ -18,7 +18,7 @@ class NotificacionController {
     listNotificacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
-            const list = yield database_1.default.query('SELECT n.IdNotificacion, n.IdPersona, N.IdTipoNoficacion, n.Titulo, n.Descripcion, tn.Icono, n.Estado FROM NOTIFICACION n INNER JOIN tipo_notificacion tn ON n.IdTipoNoficacion = tn.IdTipoNoficacion WHERE IDPERSONA = ?', [IdPersona]);
+            const [list] = yield database_1.default.query('SELECT n.IdNotificacion, n.IdPersona, n.IdTipoNoficacion, n.Titulo, n.Descripcion, tn.Icono, n.Estado FROM notificacion n INNER JOIN tipo_notificacion tn ON n.IdTipoNoficacion = tn.IdTipoNoficacion WHERE IdPersona = ?', [IdPersona]);
             res.json({
                 data: list,
                 status: true,

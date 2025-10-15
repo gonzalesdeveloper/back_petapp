@@ -6,7 +6,7 @@ const saltRounds = 10;
 
 class PersonaController{
     async getPerson (req: Request, res: Response){
-        const list = await pool.query("SELECT * FROM PERSONA");
+        const [list] = await pool.query("SELECT * FROM persona");
         res.json({
             data: list,
             status: true,
@@ -16,7 +16,8 @@ class PersonaController{
 
     async getOnePerson(req: Request, res: Response){
         const { IdPersona } = req.params;        
-        const list = await pool.query('SELECT * FROM PERSONA WHERE IDPERSONA = ?' , [IdPersona]);
+        const [list] : any = await pool.query('SELECT * FROM persona WHERE IdPersona = ?' , [IdPersona]);
+
         list[0].Password = '';
         const fecha = new Date(list[0].Nacimiento);
         const fechaFormateada = fecha.toISOString().split('T')[0];
@@ -37,7 +38,7 @@ class PersonaController{
                 req.body.password = await bcrypt.hash(req.body.password, saltRounds);
             }
             await pool.query(
-            'UPDATE PERSONA SET ? WHERE IDPERSONA = ?',
+            'UPDATE persona SET ? WHERE IDPERSONA = ?',
             [req.body, IdPersona]
             );
             res.status(201).json({ 

@@ -3,7 +3,7 @@ import pool from "../database";
 
 class EspecialidadController{
     async listEspecialidad(req: Request, res: Response){
-        const list = pool.query('SELECT * FROM ESPECIALIDAD');
+        const [list] = await pool.query('SELECT * FROM especialidad');
         res.json({
             message: 'Todo Ok',
             status: true,

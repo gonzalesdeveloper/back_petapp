@@ -3,7 +3,7 @@ import pool from "../database";
 
 class CategoriaController{
     public async listCategoria(req: Request, res: Response){
-        const list = await pool.query('SELECT * FROM CATEGORIAS');
+        const [list] = await pool.query('SELECT * FROM categorias');
         res.json({
             data: list,
             status: true,
@@ -12,7 +12,7 @@ class CategoriaController{
     }
 
     public async listCategoriaImportant(req: Request, res: Response){
-        const list = await pool.query('SELECT * FROM CATEGORIAS WHERE IMPORTANCIA = 1');
+        const [list] = await pool.query('SELECT * FROM categorias WHERE IMPORTANCIA = 1');
         res.json({
             data: list,
             status: true,
