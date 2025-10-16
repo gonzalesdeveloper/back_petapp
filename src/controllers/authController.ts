@@ -26,12 +26,12 @@ class AuthController{
           if (rows.length === 0) return res.status(401).json({ error: 'Usuario no encontrado' });
     
           const user = rows[0];
-          
+
           const match = await bcrypt.compare(Password, user.Password);
 
           if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
-          const payload = { IdPersona: user.IdPersona, Email: user.Email };
+          const payload = { IdPersona: user.IdPersona, Email: user.Email, Nombres: user.Nombres, Apellidos: user.Apellidos };
           const accessToken = generateAccessToken(payload);
           const refreshToken = generateRefreshToken(payload);
 
@@ -40,12 +40,6 @@ class AuthController{
             accessToken,
             refreshToken
           });
-
-          /* const token = jwt.sign({ IdPersona: user.IdPersona, Email: user.Email }, process.env.JWT_SECRET as string, {
-            expiresIn: '2h'
-          });  
-    
-          res.json({ message: 'Login exitoso', token }); */
     
         } catch (error) {
           console.log(error);
@@ -80,7 +74,8 @@ class AuthController{
       const { refreshToken } = req.body;
       try {
         const payload: any = jwt.verify(refreshToken, refresh); // otro secreto
-        const newAccessToken = generateAccessToken({ IdPersona: payload.IdPersona, Email: payload.Email });
+        
+        const newAccessToken = generateAccessToken({ IdPersona: payload.IdPersona, Email: payload.Email, Nombres: payload.Nombres, Apellidos: payload.Apellidos });
         /* const newAccessToken = jwt.sign({ IdPersona: payload.IdPersona }, access, { expiresIn: '15m' }); */
         res.json({ accessToken: newAccessToken });
       } catch {

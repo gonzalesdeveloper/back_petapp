@@ -36,7 +36,7 @@ class AuthController {
                 const match = yield bcrypt_1.default.compare(Password, user.Password);
                 if (!match)
                     return res.status(401).json({ error: 'Contraseña incorrecta' });
-                const payload = { IdPersona: user.IdPersona, Email: user.Email };
+                const payload = { IdPersona: user.IdPersona, Email: user.Email, Nombres: user.Nombres, Apellidos: user.Apellidos };
                 const accessToken = (0, token_util_1.generateAccessToken)(payload);
                 const refreshToken = (0, token_util_1.generateRefreshToken)(payload);
                 res.json({
@@ -44,11 +44,6 @@ class AuthController {
                     accessToken,
                     refreshToken
                 });
-                /* const token = jwt.sign({ IdPersona: user.IdPersona, Email: user.Email }, process.env.JWT_SECRET as string, {
-                  expiresIn: '2h'
-                });
-          
-                res.json({ message: 'Login exitoso', token }); */
             }
             catch (error) {
                 console.log(error);
@@ -80,7 +75,7 @@ class AuthController {
             const { refreshToken } = req.body;
             try {
                 const payload = jsonwebtoken_1.default.verify(refreshToken, refresh); // otro secreto
-                const newAccessToken = (0, token_util_1.generateAccessToken)({ IdPersona: payload.IdPersona, Email: payload.Email });
+                const newAccessToken = (0, token_util_1.generateAccessToken)({ IdPersona: payload.IdPersona, Email: payload.Email, Nombres: payload.Nombres, Apellidos: payload.Apellidos });
                 /* const newAccessToken = jwt.sign({ IdPersona: payload.IdPersona }, access, { expiresIn: '15m' }); */
                 res.json({ accessToken: newAccessToken });
             }
