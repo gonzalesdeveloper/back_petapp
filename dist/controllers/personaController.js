@@ -46,17 +46,22 @@ class PersonaController {
     editPerson(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
+            console.log(req.body);
             try {
                 if (req.body.password) {
                     req.body.password = yield bcrypt_1.default.hash(req.body.password, saltRounds);
                 }
-                yield database_1.default.query('UPDATE persona SET ? WHERE IDPERSONA = ?', [req.body, IdPersona]);
+                const fecha = new Date(req.body.Nacimiento);
+                const fechaFormateada = fecha.toISOString().split('T')[0];
+                req.body.Nacimiento = fechaFormateada;
+                yield database_1.default.query('UPDATE persona SET ? WHERE IdPersona = ?', [req.body, IdPersona]);
                 res.status(201).json({
                     message: 'Usuario Actualizado',
                     /* data: [] */
                 });
             }
             catch (error) {
+                console.log(error);
                 res.status(500).json({
                     error: 'Error al Actualizar Usuario'
                 });
