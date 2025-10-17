@@ -10,6 +10,16 @@ class VetController{
             message: 'Todo Correcto'
         });
     }
+
+    public async listVetUnique(req: Request, res: Response){
+        const { IdVeterinaria } = req.params;
+        const [list] = await pool.query('SELECT * FROM veterinaria WHERE IdVeterinaria = ?', IdVeterinaria);
+        res.json({
+            data: list,
+            status: true,
+            message: 'Todo Correcto'
+        });
+    }
 }
 
 export const vetController = new VetController();

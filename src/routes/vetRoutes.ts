@@ -10,6 +10,7 @@ class VetRoutes{
 
     config(): void{
         this.router.get('/list', vetController.listVet);
+        this.router.get('/listone/:IdVeterinaria', vetController.listVetUnique);
     }
 }
 
