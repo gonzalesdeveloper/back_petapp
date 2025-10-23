@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.comentarioController = void 0;
 const database_1 = __importDefault(require("../database"));
 class ComentarioController {
+    /* COMENTARIOS HACIA EL DOCTOR */
     getComentarioDoctor(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdDoctor } = req.params;
@@ -33,6 +34,18 @@ class ComentarioController {
             res.json({
                 message: 'Creado Correctamente',
                 status: true,
+            });
+        });
+    }
+    /* COMENTARIOS HACIA LA VETERINARIA */
+    getComentarioVet(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdVeterinaria } = req.params;
+            const [list] = yield database_1.default.query('SELECT c.IdComentario, c.IdPersona, p.Foto, c.Titulo, c.Descripcion, c.Rating, c.Fecha, c.comentable_id, c.comentable_typo, c.Estado FROM comentario c INNER JOIN persona p ON c.IdPersona = p.IdPersona WHERE comentable_typo = ? AND comentable_id = ?', ['veterinaria', IdVeterinaria]);
+            res.json({
+                message: 'Todo Correcto',
+                status: true,
+                data: list
             });
         });
     }

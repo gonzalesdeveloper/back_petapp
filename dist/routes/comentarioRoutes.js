@@ -8,8 +8,9 @@ class ComentarioRoutes {
         this.config();
     }
     config() {
-        this.router.get('/list/:IdDoctor', comentarioController_1.comentarioController.getComentarioDoctor);
+        this.router.get('/listdoc/:IdDoctor', comentarioController_1.comentarioController.getComentarioDoctor);
         this.router.post('/create', comentarioController_1.comentarioController.createComentarioDoctor);
+        this.router.get('/listvet/:IdVeterinaria', comentarioController_1.comentarioController.getComentarioVet);
     }
 }
 const comentarioRoutes = new ComentarioRoutes();
