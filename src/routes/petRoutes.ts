@@ -10,7 +10,7 @@ class PetRoutes{
 
     config(): void{
         this.routes.get('/list', petController.listPetLost);
-        this.routes.get('/listone', petController.listPetOneLost);
+        this.routes.get('/listone/:IdPet', petController.listPetOneLost);
     }
 }
 
