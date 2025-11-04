@@ -25,5 +25,16 @@ class BlogController {
             });
         });
     }
+    getBlogOne(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdBlog } = req.params;
+            const [list] = yield database_1.default.query('SELECT * FROM BLOG WHERE IdBlog = ?', [IdBlog]);
+            res.json({
+                data: list,
+                status: true,
+                message: 'Todo Correcto'
+            });
+        });
+    }
 }
 exports.blogController = new BlogController();

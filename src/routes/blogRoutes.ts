@@ -10,6 +10,7 @@ class BlogRoutes{
 
     config(): void{
         this.router.get('/list', blogController.listBlog);
+        this.router.get('/listone/:IdBlog', blogController.getBlogOne);
     }
 }
 

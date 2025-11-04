@@ -10,6 +10,16 @@ class BlogController{
             message: 'Todo Correcto'
         });
     }
+
+    public async getBlogOne(req: Request, res: Response){
+        const { IdBlog } = req.params;
+        const [list] = await pool.query('SELECT * FROM BLOG WHERE IdBlog = ?', [IdBlog]);
+        res.json({
+            data: list,
+            status: true,
+            message: 'Todo Correcto'
+        });
+    }
 }
 
 export const blogController = new BlogController();
