@@ -3,6 +3,7 @@ import pool from "../database";
 
 class EventoController{
     public async listEvento(req: Request, res: Response): Promise<any> {
+      const { IdPersona } = req.params;
         try {
           // 1️⃣ Obtener todos los eventos
           const [eventos]: any = await pool.query('SELECT * FROM evento');
@@ -26,10 +27,12 @@ class EventoController{
           // 3️⃣ Asociar asistentes a sus eventos
           const data = eventos.map((evento: any) => {
             const personas = asistentes.filter((a: any) => a.IdEvento === evento.IdEvento);
+            const asistire = personas.some((a: any) => a.IdPersona == IdPersona);
             return {
               ...evento,
               Asistentes: personas.slice(0, 3), // 🔹 muestra los primeros 3
-              TotalAsistentes: personas.length
+              TotalAsistentes: personas.length,
+              Asisitire: asistire
             };
           });
       

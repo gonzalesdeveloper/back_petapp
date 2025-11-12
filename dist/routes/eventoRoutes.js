@@ -8,7 +8,7 @@ class EventoRoutes {
         this.config();
     }
     config() {
-        this.router.get('/list', eventoController_1.eventoController.listEvento);
+        this.router.get('/list/:IdPersona', eventoController_1.eventoController.listEvento);
         this.router.post('/asistir', eventoController_1.eventoController.setAsistent);
     }
 }

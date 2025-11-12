@@ -17,6 +17,7 @@ const database_1 = __importDefault(require("../database"));
 class EventoController {
     listEvento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { IdPersona } = req.params;
             try {
                 // 1️⃣ Obtener todos los eventos
                 const [eventos] = yield database_1.default.query('SELECT * FROM evento');
@@ -37,7 +38,8 @@ class EventoController {
                 // 3️⃣ Asociar asistentes a sus eventos
                 const data = eventos.map((evento) => {
                     const personas = asistentes.filter((a) => a.IdEvento === evento.IdEvento);
-                    return Object.assign(Object.assign({}, evento), { Asistentes: personas.slice(0, 3), TotalAsistentes: personas.length });
+                    const asistire = personas.some((a) => a.IdPersona == IdPersona);
+                    return Object.assign(Object.assign({}, evento), { Asistentes: personas.slice(0, 3), TotalAsistentes: personas.length, Asisitire: asistire });
                 });
                 // 4️⃣ Devolver todo en una sola respuesta
                 res.json({
