@@ -9,6 +9,7 @@ class EventoRoutes {
     }
     config() {
         this.router.get('/list', eventoController_1.eventoController.listEvento);
+        this.router.post('/asistir', eventoController_1.eventoController.setAsistent);
     }
 }
 const eventoRoutes = new EventoRoutes();

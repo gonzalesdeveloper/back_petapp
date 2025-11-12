@@ -10,6 +10,7 @@ class EventoRoutes{
 
     config(): void{
         this.router.get('/list', eventoController.listEvento);
+        this.router.post('/asistir', eventoController.setAsistent);
     }
 }
 
