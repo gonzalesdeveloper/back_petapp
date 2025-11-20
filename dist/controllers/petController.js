@@ -41,5 +41,79 @@ class PetController {
             });
         });
     }
+    listPetAdoption(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const [list] = yield database_1.default.query(`
+        SELECT 
+        p.IdPet,
+        p.Nombre,
+        p.Apellidos,
+        p.Foto,
+        tm.Descripcion AS TipoMascota,
+        p.Edad,
+        p.Peso,
+        
+        ma.Estado,
+        ma.Fecha_Registro,
+        ma.Lugar_Entrega,
+        ma.Vacunas_Completas,
+        ma.Castrado,
+        ma.Tipo_Adopcion,
+        ma.Costo_Adopcion,
+        ma.Contacto,
+        ma.Descripcion AS Detalle_Adopcion
+        
+        FROM pet p
+
+        INNER JOIN mascota_adopcion ma ON p.IdPet = ma.IdPet
+        INNER JOIN tipomascota tm ON p.IdTipoMascota = tm.IdTipoMascota
+
+        WHERE p.Tipo = 'adopcion';
+      `);
+            res.json({
+                data: list,
+                message: 'Todo Ok',
+                status: true
+            });
+        });
+    }
+    listPetOneAdoption(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdPet } = req.params;
+            const [list] = yield database_1.default.query(`
+        SELECT 
+        p.IdPet,
+        p.Nombre,
+        p.Apellidos,
+        p.Foto,
+        tm.Descripcion AS TipoMascota,
+        p.Edad,
+        p.Peso,
+        
+        ma.Estado,
+        ma.Fecha_Registro,
+        ma.Lugar_Entrega,
+        ma.Vacunas_Completas,
+        ma.Castrado,
+        ma.Tipo_Adopcion,
+        ma.Costo_Adopcion,
+        ma.Contacto,
+        ma.Descripcion AS Detalle_Adopcion
+        
+        FROM pet p
+
+        INNER JOIN mascota_adopcion ma ON p.IdPet = ma.IdPet
+        INNER JOIN tipomascota tm ON p.IdTipoMascota = tm.IdTipoMascota
+
+        WHERE p.Tipo = 'adopcion'
+        AND p.IdPet = ?;
+      `, IdPet);
+            res.json({
+                data: list,
+                message: 'Todo Ok',
+                status: true
+            });
+        });
+    }
 }
 exports.petController = new PetController();

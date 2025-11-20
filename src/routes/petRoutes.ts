@@ -11,6 +11,8 @@ class PetRoutes{
     config(): void{
         this.routes.get('/list', petController.listPetLost);
         this.routes.get('/listone/:IdPet', petController.listPetOneLost);
+        this.routes.get('/listadoption', petController.listPetAdoption);
+        this.routes.get('/listoneadoption/:IdPet', petController.listPetOneAdoption);
     }
 }
 
