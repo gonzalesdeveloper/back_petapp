@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.personaController = void 0;
 const database_1 = __importDefault(require("../database"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
+const token_util_1 = require("../utils/token.util");
 const saltRounds = 10;
 class PersonaController {
     getPerson(req, res) {
@@ -47,17 +48,46 @@ class PersonaController {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
             console.log(req.body);
+            const data = req.body;
             try {
-                if (req.body.password) {
-                    req.body.password = yield bcrypt_1.default.hash(req.body.password, saltRounds);
+                if (data.Password) {
+                    data.Password = yield bcrypt_1.default.hash(data.Password, saltRounds);
                 }
-                const fecha = new Date(req.body.Nacimiento);
-                const fechaFormateada = fecha.toISOString().split('T')[0];
-                req.body.Nacimiento = fechaFormateada;
-                yield database_1.default.query('UPDATE persona SET ? WHERE IdPersona = ?', [req.body, IdPersona]);
+                else {
+                    delete (data.Password);
+                }
+                if (data.Nacimiento) {
+                    const fecha = new Date(data.Nacimiento);
+                    const fechaFormateada = fecha.toISOString().split('T')[0];
+                    data.Nacimiento = fechaFormateada;
+                }
+                else {
+                    delete (data.Nacimiento);
+                }
+                yield database_1.default.query('UPDATE persona SET ? WHERE IdPersona = ?', [data, IdPersona]);
+                // Ver si requiere regenerar token 🔐
+                const camposToken = ['Email', 'Nombres', 'Apellidos'];
+                const requiereToken = camposToken.some(campo => campo in data);
+                let accessToken = null;
+                let refreshToken = null;
+                if (requiereToken) {
+                    // Obtener persona actualizada
+                    const [rows] = yield database_1.default.query('SELECT IdPersona, Email, Nombres, Apellidos FROM persona WHERE IdPersona = ?', [IdPersona]);
+                    const persona = rows[0];
+                    const payload = {
+                        IdPersona: persona.IdPersona,
+                        Email: persona.Email,
+                        Nombres: persona.Nombres,
+                        Apellidos: persona.Apellidos
+                    };
+                    accessToken = (0, token_util_1.generateAccessToken)(payload);
+                    refreshToken = (0, token_util_1.generateRefreshToken)(payload);
+                }
                 res.status(201).json({
+                    status: true,
                     message: 'Usuario Actualizado',
-                    /* data: [] */
+                    accessToken,
+                    refreshToken
                 });
             }
             catch (error) {
