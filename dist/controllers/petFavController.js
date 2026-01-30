@@ -26,5 +26,44 @@ class PetFavController {
             });
         });
     }
+    /* pet fav */
+    petFav(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdPersona, IdPet } = req.body;
+            if (!IdPersona || !IdPet) {
+                return res.status(400).json({
+                    status: false,
+                    message: 'Se requiere IdPersona e IdMascota'
+                });
+            }
+            try {
+                const [rows] = yield database_1.default.query('SELECT * FROM favpet WHERE IdPersona = ? AND IdPet = ?', [IdPersona, IdPet]);
+                if (rows.length > 0) {
+                    yield database_1.default.query('DELETE FROM favpet WHERE IdPersona = ? AND IdPet = ?', [IdPersona, IdPet]);
+                    return res.json({
+                        status: true,
+                        favorite: false,
+                        message: 'Eliminado de favoritos'
+                    });
+                }
+                else {
+                    yield database_1.default.query('INSERT INTO favpet (IdPersona, IdPet) VALUES (?, ?)', [IdPersona, IdPet]);
+                    return res.json({
+                        status: true,
+                        favorite: true,
+                        message: 'Marcado como favorito'
+                    });
+                }
+            }
+            catch (error) {
+                console.error('Error en mascotaFavorita:', error);
+                return res.status(500).json({
+                    status: false,
+                    message: 'Error en el servidor',
+                    error: error.message
+                });
+            }
+        });
+    }
 }
 exports.petFavController = new PetFavController();

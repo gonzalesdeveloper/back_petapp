@@ -79,7 +79,7 @@ class PetController {
     }
     listPetOneAdoption(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { IdPet } = req.params;
+            const { IdPersona, IdPet } = req.params;
             const [list] = yield database_1.default.query(`
         SELECT 
         p.IdPet,
@@ -98,16 +98,24 @@ class PetController {
         ma.Tipo_Adopcion,
         ma.Costo_Adopcion,
         ma.Contacto,
-        ma.Descripcion AS Detalle_Adopcion
+        ma.Descripcion AS Detalle_Adopcion,
         
+        CASE 
+        WHEN mf.IdPet IS NULL THEN false
+        ELSE true
+        END AS EsFavorito
+
         FROM pet p
 
         INNER JOIN mascota_adopcion ma ON p.IdPet = ma.IdPet
         INNER JOIN tipomascota tm ON p.IdTipoMascota = tm.IdTipoMascota
+        LEFT JOIN favpet mf 
+        ON mf.IdPet = p.IdPet AND mf.IdPersona = ?
 
         WHERE p.Tipo = 'adopcion'
-        AND p.IdPet = ?;
-      `, IdPet);
+        AND p.IdPet = ?
+        LIMIT 1 ;
+      `, [IdPersona, IdPet]);
             res.json({
                 data: list,
                 message: 'Todo Ok',

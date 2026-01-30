@@ -11,6 +11,59 @@ class PetFavController{
             data: list
         });
     }
+
+    /* pet fav */
+    async petFav(req: Request, res: Response): Promise<any> {
+        const { IdPersona, IdPet } = req.body;
+    
+        if (!IdPersona || !IdPet) {
+            return res.status(400).json({
+                status: false,
+                message: 'Se requiere IdPersona e IdMascota'
+            });
+        }
+    
+        try {
+            const [rows]: any = await pool.query(
+                'SELECT * FROM favpet WHERE IdPersona = ? AND IdPet = ?',
+                [IdPersona, IdPet]
+            );
+    
+            if (rows.length > 0) {
+                await pool.query(
+                    'DELETE FROM favpet WHERE IdPersona = ? AND IdPet = ?',
+                    [IdPersona, IdPet]
+                );
+    
+                return res.json({
+                    status: true,
+                    favorite: false,
+                    message: 'Eliminado de favoritos'
+                });
+    
+            } else {
+                await pool.query(
+                    'INSERT INTO favpet (IdPersona, IdPet) VALUES (?, ?)',
+                    [IdPersona, IdPet]
+                );
+    
+                return res.json({
+                    status: true,
+                    favorite: true,
+                    message: 'Marcado como favorito'
+                });
+            }
+    
+        } catch (error: any) {
+            console.error('Error en mascotaFavorita:', error);
+            return res.status(500).json({
+                status: false,
+                message: 'Error en el servidor',
+                error: error.message
+            });
+        }
+    }
+    
 }
 
 export const petFavController = new PetFavController();

@@ -9,6 +9,7 @@ class PetFavRoutes {
     }
     config() {
         this.router.get('/list/:IdPersona', petFavController_1.petFavController.getFavPet);
+        this.router.post('/fav', petFavController_1.petFavController.petFav);
     }
 }
 const petFavRoutes = new PetFavRoutes();
