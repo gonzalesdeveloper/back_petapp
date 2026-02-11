@@ -34,7 +34,6 @@ class PersonaController{
     /* editar persona */
     public async editPerson(req: Request, res: Response){
         const { IdPersona} = req.params;
-        console.log(req.body);
         const data = req.body;
         
         try {

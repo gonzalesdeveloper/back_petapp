@@ -10,6 +10,44 @@ class FundacionController{
             data: list
         })
     }
+
+    public async getOneFundation(req: Request, res: Response){
+        try {
+            const { IdFundacion } = req.params;
+    
+            const [fundacionRows]: any = await pool.query(
+                'SELECT * FROM fundacion WHERE IdFundacion = ?',
+                [IdFundacion]
+            );
+    
+            if (fundacionRows.length === 0) {
+                res.status(404).json({
+                    status: false,
+                    message: 'Fundación no encontrada'
+                });
+                return;
+            }
+    
+            const [fotosRows]: any = await pool.query(
+                'SELECT * FROM fundacion_foto WHERE IdFundacion = ?',
+                [IdFundacion]
+            );
+    
+            fundacionRows[0].Fotos = fotosRows;
+    
+            res.json({
+                status: true,
+                message: 'Todo Ok',
+                data: fundacionRows
+            });
+    
+        } catch (error) {
+            res.status(500).json({
+                status: false,
+                message: 'Error del servidor'
+            });
+        }
+    }
 }
 
 export const fundacionController = new FundacionController;

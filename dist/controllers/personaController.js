@@ -47,7 +47,6 @@ class PersonaController {
     editPerson(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
-            console.log(req.body);
             const data = req.body;
             try {
                 if (data.Password) {
