@@ -25,6 +25,16 @@ class FundacionController {
             });
         });
     }
+    getFundationsSelect(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const [list] = yield database_1.default.query('SELECT IdFundacion, Nombre FROM fundacion');
+            res.json({
+                status: true,
+                message: 'Todo Ok',
+                data: list
+            });
+        });
+    }
     getOneFundation(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {

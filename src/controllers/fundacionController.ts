@@ -11,6 +11,16 @@ class FundacionController{
         })
     }
 
+    public async getFundationsSelect(req: Request, res: Response){
+        const [list] = await pool.query('SELECT IdFundacion, Nombre FROM fundacion');
+        res.json({
+            status: true,
+            message: 'Todo Ok',
+            data: list
+        })
+    }
+
+
     public async getOneFundation(req: Request, res: Response){
         try {
             const { IdFundacion } = req.params;
