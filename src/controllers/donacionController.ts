@@ -21,6 +21,17 @@ class DonacionController{
             data: list
         })
     }
+
+
+    async listDonacion(req: Request, res: Response){
+        const { IdPersona } = req.params;
+        const [ list ] = await pool.query('SELECT d.IdDonacion, d.Monto, d.MetodoPago, d.Fecha, d.Estado, f.Nombre   AS Fundacion, f.Ubicacion FROM donacion d INNER JOIN fundacion f ON d.IdFundacion = f.IdFundacion WHERE d.IdPersona = ?', [ IdPersona ]);
+        res.json({
+            status: true,
+            message: 'Todo Ok',
+            data: list
+        })
+    }
 }
 
 export const donacionController = new DonacionController();

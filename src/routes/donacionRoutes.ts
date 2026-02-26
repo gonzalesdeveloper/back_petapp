@@ -10,6 +10,7 @@ class DonacionRoutes{
     config():void{
         this.router.post('/create', donacionController.insertDonacion);
         this.router.get('/listmethod/:IdFundacion', donacionController.listMetodoDonacion);
+        this.router.get('/list-donation/:IdPersona', donacionController.listDonacion);
     }
 }
 
