@@ -40,10 +40,33 @@ class DonacionController {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
             const [list] = yield database_1.default.query('SELECT d.IdDonacion, d.Monto, d.MetodoPago, d.Fecha, d.Estado, f.Nombre   AS Fundacion, f.Ubicacion FROM donacion d INNER JOIN fundacion f ON d.IdFundacion = f.IdFundacion WHERE d.IdPersona = ?', [IdPersona]);
+            const Pendientes = [];
+            const Aprobadas = [];
+            const Rechazadas = [];
+            list.forEach((donacion) => {
+                if (donacion.Estado === 'pendiente') {
+                    Pendientes.push(donacion);
+                }
+                else if (donacion.Estado === 'aprobado') {
+                    Aprobadas.push(donacion);
+                }
+                else if (donacion.Estado === 'rechazado') {
+                    Rechazadas.push(donacion);
+                }
+            });
             res.json({
                 status: true,
                 message: 'Todo Ok',
-                data: list
+                data: {
+                    Pendientes,
+                    Aprobadas,
+                    Rechazadas,
+                    contadores: {
+                        pendientes: Pendientes.length,
+                        aprobadas: Aprobadas.length,
+                        rechazadas: Rechazadas.length
+                    }
+                }
             });
         });
     }
