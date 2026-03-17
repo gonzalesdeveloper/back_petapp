@@ -27,19 +27,9 @@ class DonacionController{
         const { IdPersona } = req.params;
         const [ list ] : any[] = await pool.query('SELECT d.IdDonacion, d.Monto, d.MetodoPago, d.Fecha, d.Estado, f.Nombre   AS Fundacion, f.Ubicacion FROM donacion d INNER JOIN fundacion f ON d.IdFundacion = f.IdFundacion WHERE d.IdPersona = ?', [ IdPersona ]);
         
-        const Pendientes: any[] = [];
-        const Aprobadas: any[] = [];
-        const Rechazadas: any[] = [];
-
-        list.forEach((donacion: any) => {
-            if (donacion.Estado === 'pendiente') {
-                Pendientes.push(donacion);
-            } else if (donacion.Estado === 'aprobado') {
-                Aprobadas.push(donacion);
-            } else if (donacion.Estado === 'rechazado') {
-                Rechazadas.push(donacion);
-            }
-        });
+        const Pendientes = list.filter((d: any) => d.Estado === 'pendiente');
+        const Aprobadas  = list.filter((d: any) => d.Estado === 'aprobado');
+        const Rechazadas = list.filter((d: any) => d.Estado === 'rechazado');
 
         res.json({
             status: true,

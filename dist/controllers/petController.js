@@ -154,6 +154,7 @@ class PetController {
         p.Edad,
         p.Peso,
         
+        ma.IdMascotaAdopcion,
         ma.Estado,
         ma.Fecha_Registro,
         ma.Lugar_Entrega,

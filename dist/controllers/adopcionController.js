@@ -17,16 +17,99 @@ const database_1 = __importDefault(require("../database"));
 class AdopcionController {
     setStateAdoption(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { IdPersona, IdMascotaAdopcion, Mensaje } = req.body;
+            const conn = yield database_1.default.getConnection();
             try {
-                const { IdPersona, IdAdopcion, MensajeOpcional } = req.body;
-                yield database_1.default.query(`INSERT INTO solicitud_adopcion 
-                (IdPersona, IdAdopcion, Fecha_Solicitud, EstadoSolicitud, MensajeOpcional) 
-                VALUES (?, ?, NOW(), 'ENVIADA', ?)`, [IdPersona, IdAdopcion, MensajeOpcional]);
+                yield conn.beginTransaction();
+                console.log();
+                const [existe] = yield conn.query(`
+            SELECT 1 
+            FROM solicitud_adopcion 
+            WHERE IdPersona = ? AND IdMascotaAdopcion = ?
+          `, [IdPersona, IdMascotaAdopcion]);
+                if (existe.length > 0) {
+                    throw new Error("Ya existe una solicitud para esta mascota");
+                }
+                const [result] = yield database_1.default.query(`INSERT INTO solicitud_adopcion 
+              (IdPersona, IdMascotaAdopcion, Fecha_Solicitud, Estado_Solicitud, Mensaje) 
+              VALUES (?, ?, NOW(), 'Pendiente', ?)`, [IdPersona, IdMascotaAdopcion, Mensaje]);
+                const IdSolicitud = result.insertId;
+                // 2 insertar historial
+                yield conn.query(`
+            INSERT INTO adopcion_historial
+            (IdSolicitud, EstadoAnterior, EstadoNuevo, FechaCambio)
+            VALUES (?, NULL, 'Pendiente', NOW())
+        `, [IdSolicitud]);
+                yield conn.commit();
                 return res.json({ ok: true, message: "Solicitud enviada correctamente" });
             }
             catch (error) {
-                console.log(error);
                 return res.status(500).json({ ok: false, error });
+            }
+            finally {
+                conn.release();
+            }
+        });
+    }
+    listAdoption(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdPersona } = req.params;
+            const [list] = yield database_1.default.query(`SELECT sa.IdSolicitud, sa.Estado_Solicitud, sa.Fecha_Solicitud, p.Nombre, tm.Descripcion AS Tipo, r.Descripcion AS Raza, c.Descripcion AS Color, p.Foto 
+        FROM solicitud_adopcion sa
+        INNER JOIN mascota_adopcion ma 
+          ON sa.IdMascotaAdopcion = ma.IdMascotaAdopcion
+        INNER JOIN pet p
+          ON ma.IdPet = p.IdPet
+        INNER JOIN tipomascota tm
+          ON p.IdTipoMascota = tm.IdTipoMascota
+        INNER JOIN raza r
+          ON p.IdRaza = r.IdRaza
+        INNER JOIN color c
+          ON p.IdColor = c.IdColor
+        WHERE sa.IdPersona = ?
+        ORDER BY sa.Fecha_Solicitud DESC;`, [IdPersona]);
+            res.json({
+                status: true,
+                message: 'Todo Ok',
+                data: list
+            });
+        });
+    }
+    actualizarEstadoSolicitud(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdSolicitud, EstadoNuevo } = req.body;
+            const conn = yield database_1.default.getConnection();
+            try {
+                yield conn.beginTransaction();
+                // 1. obtener estado actual
+                const [rows] = yield conn.query(`
+          SELECT Estado, IdMascotaAdopcion, IdPersona
+          FROM solicitud_adopcion
+          WHERE IdSolicitud = ?
+        `, [IdSolicitud]);
+                const solicitud = rows[0];
+                const estadoAnterior = solicitud.Estado;
+                // 2. actualizar estado
+                yield conn.query(`
+          UPDATE solicitud_adopcion
+          SET Estado = ?
+          WHERE IdSolicitud = ?
+        `, [EstadoNuevo, IdSolicitud]);
+                // 3. guardar historial
+                yield conn.query(`
+          INSERT INTO adopcion_historial
+          (IdSolicitud, EstadoAnterior, EstadoNuevo, FechaCambio)
+          VALUES (?, ?, ?, NOW())
+        `, [IdSolicitud, estadoAnterior, EstadoNuevo]);
+                yield conn.commit();
+                res.json({ ok: true });
+            }
+            catch (error) {
+                yield conn.rollback();
+                res.status(500).json(error);
+            }
+            finally {
+                conn.release();
             }
         });
     }
