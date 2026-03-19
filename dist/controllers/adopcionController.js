@@ -18,33 +18,77 @@ class AdopcionController {
     setStateAdoption(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona, IdMascotaAdopcion, Mensaje } = req.body;
+            console.log(IdPersona, IdMascotaAdopcion);
             const conn = yield database_1.default.getConnection();
             try {
-                yield conn.beginTransaction();
-                console.log();
+                yield conn.beginTransaction(); // ✅ CORRECTO
+                console.log('Inicio transacción');
+                // 🔹 1. Validar duplicado
                 const [existe] = yield conn.query(`
-            SELECT 1 
-            FROM solicitud_adopcion 
-            WHERE IdPersona = ? AND IdMascotaAdopcion = ?
-          `, [IdPersona, IdMascotaAdopcion]);
+        SELECT * 
+        FROM solicitud_adopcion 
+        WHERE IdPersona = ? AND IdMascotaAdopcion = ?
+      `, [IdPersona, IdMascotaAdopcion]);
+                console.log('Existe:', existe);
                 if (existe.length > 0) {
-                    throw new Error("Ya existe una solicitud para esta mascota");
+                    yield conn.rollback();
+                    return res.status(409).json({
+                        ok: false,
+                        message: "Ya existe una solicitud para esta mascota"
+                    });
                 }
-                const [result] = yield database_1.default.query(`INSERT INTO solicitud_adopcion 
-              (IdPersona, IdMascotaAdopcion, Fecha_Solicitud, Estado_Solicitud, Mensaje) 
-              VALUES (?, ?, NOW(), 'Pendiente', ?)`, [IdPersona, IdMascotaAdopcion, Mensaje]);
+                // 🔹 2. Validar estado mascota
+                const [estadoMascota] = yield conn.query(`
+        SELECT Estado
+        FROM mascota_adopcion
+        WHERE IdMascotaAdopcion = ?
+      `, [IdMascotaAdopcion]);
+                console.log('Estado mascota:', estadoMascota);
+                if (!estadoMascota.length) {
+                    yield conn.rollback();
+                    return res.status(404).json({
+                        ok: false,
+                        message: 'Mascota no encontrada'
+                    });
+                }
+                if (estadoMascota[0].Estado === 'Adoptado') {
+                    yield conn.rollback();
+                    return res.status(409).json({
+                        ok: false,
+                        message: "La mascota ya fue adoptada"
+                    });
+                }
+                // 🔹 3. Insertar solicitud
+                const [result] = yield conn.query(`
+        INSERT INTO solicitud_adopcion 
+        (IdPersona, IdMascotaAdopcion, Fecha_Solicitud, Estado_Solicitud, Mensaje) 
+        VALUES (?, ?, NOW(), 'Pendiente', ?)
+      `, [IdPersona, IdMascotaAdopcion, Mensaje]);
                 const IdSolicitud = result.insertId;
-                // 2 insertar historial
+                console.log('Solicitud creada:', IdSolicitud);
+                // 🔹 4. Insertar historial
                 yield conn.query(`
-            INSERT INTO adopcion_historial
-            (IdSolicitud, EstadoAnterior, EstadoNuevo, FechaCambio)
-            VALUES (?, NULL, 'Pendiente', NOW())
-        `, [IdSolicitud]);
+        INSERT INTO adopcion_historial
+        (IdSolicitud, EstadoAnterior, EstadoNuevo, FechaCambio)
+        VALUES (?, NULL, 'Pendiente', NOW())
+      `, [IdSolicitud]);
+                console.log('Historial insertado');
                 yield conn.commit();
-                return res.json({ ok: true, message: "Solicitud enviada correctamente" });
+                console.log('Commit OK');
+                return res.json({
+                    ok: true,
+                    message: "Solicitud enviada correctamente",
+                    IdSolicitud
+                });
             }
             catch (error) {
-                return res.status(500).json({ ok: false, error });
+                console.error('ERROR BACKEND:', error);
+                yield conn.rollback();
+                return res.status(500).json({
+                    ok: false,
+                    message: "Error interno del servidor",
+                    detail: error.message
+                });
             }
             finally {
                 conn.release();
@@ -55,19 +99,19 @@ class AdopcionController {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
             const [list] = yield database_1.default.query(`SELECT sa.IdSolicitud, sa.Estado_Solicitud, sa.Fecha_Solicitud, p.Nombre, tm.Descripcion AS Tipo, r.Descripcion AS Raza, c.Descripcion AS Color, p.Foto 
-        FROM solicitud_adopcion sa
-        INNER JOIN mascota_adopcion ma 
-          ON sa.IdMascotaAdopcion = ma.IdMascotaAdopcion
-        INNER JOIN pet p
-          ON ma.IdPet = p.IdPet
-        INNER JOIN tipomascota tm
-          ON p.IdTipoMascota = tm.IdTipoMascota
-        INNER JOIN raza r
-          ON p.IdRaza = r.IdRaza
-        INNER JOIN color c
-          ON p.IdColor = c.IdColor
-        WHERE sa.IdPersona = ?
-        ORDER BY sa.Fecha_Solicitud DESC;`, [IdPersona]);
+      FROM solicitud_adopcion sa
+      INNER JOIN mascota_adopcion ma 
+        ON sa.IdMascotaAdopcion = ma.IdMascotaAdopcion
+      INNER JOIN pet p
+        ON ma.IdPet = p.IdPet
+      INNER JOIN tipomascota tm
+        ON p.IdTipoMascota = tm.IdTipoMascota
+      INNER JOIN raza r
+        ON p.IdRaza = r.IdRaza
+      INNER JOIN color c
+        ON p.IdColor = c.IdColor
+      WHERE sa.IdPersona = ?
+      ORDER BY sa.Fecha_Solicitud DESC;`, [IdPersona]);
             res.json({
                 status: true,
                 message: 'Todo Ok',
@@ -83,24 +127,24 @@ class AdopcionController {
                 yield conn.beginTransaction();
                 // 1. obtener estado actual
                 const [rows] = yield conn.query(`
-          SELECT Estado, IdMascotaAdopcion, IdPersona
-          FROM solicitud_adopcion
-          WHERE IdSolicitud = ?
-        `, [IdSolicitud]);
+        SELECT Estado, IdMascotaAdopcion, IdPersona
+        FROM solicitud_adopcion
+        WHERE IdSolicitud = ?
+      `, [IdSolicitud]);
                 const solicitud = rows[0];
                 const estadoAnterior = solicitud.Estado;
                 // 2. actualizar estado
                 yield conn.query(`
-          UPDATE solicitud_adopcion
-          SET Estado = ?
-          WHERE IdSolicitud = ?
-        `, [EstadoNuevo, IdSolicitud]);
+        UPDATE solicitud_adopcion
+        SET Estado = ?
+        WHERE IdSolicitud = ?
+      `, [EstadoNuevo, IdSolicitud]);
                 // 3. guardar historial
                 yield conn.query(`
-          INSERT INTO adopcion_historial
-          (IdSolicitud, EstadoAnterior, EstadoNuevo, FechaCambio)
-          VALUES (?, ?, ?, NOW())
-        `, [IdSolicitud, estadoAnterior, EstadoNuevo]);
+        INSERT INTO adopcion_historial
+        (IdSolicitud, EstadoAnterior, EstadoNuevo, FechaCambio)
+        VALUES (?, ?, ?, NOW())
+      `, [IdSolicitud, estadoAnterior, EstadoNuevo]);
                 yield conn.commit();
                 res.json({ ok: true });
             }

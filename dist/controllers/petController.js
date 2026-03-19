@@ -107,6 +107,7 @@ class PetController {
     /* pet adopcion */
     listPetAdoption(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            const { IdPersona } = req.params;
             const [list] = yield database_1.default.query(`
         SELECT 
         p.IdPet,
@@ -132,8 +133,14 @@ class PetController {
         INNER JOIN mascota_adopcion ma ON p.IdPet = ma.IdPet
         INNER JOIN tipomascota tm ON p.IdTipoMascota = tm.IdTipoMascota
 
-        WHERE p.Tipo = 'adopcion';
-      `);
+        WHERE p.Tipo = 'adopcion'
+        AND ma.Estado = 'Disponible'
+        AND ma.IdMascotaAdopcion NOT IN (
+          SELECT IdMascotaAdopcion
+          FROM solicitud_adopcion
+          WHERE IdPersona = ?
+        );;
+      `, [IdPersona]);
             res.json({
                 data: list,
                 message: 'Todo Ok',
@@ -185,6 +192,33 @@ class PetController {
                 data: list,
                 message: 'Todo Ok',
                 status: true
+            });
+        });
+    }
+    listMyAdoptions(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdPersona } = req.params;
+            const [list] = yield database_1.default.query(`SELECT sa.IdSolicitud, sa.Estado_Solicitud, sa.Fecha_Solicitud, p.Nombre, p.Edad, p.Foto,
+      tm.Descripcion AS TipoMascota, p.Peso
+      
+      FROM solicitud_adopcion sa
+      
+      INNER JOIN mascota_adopcion ma 
+        ON sa.IdMascotaAdopcion = ma.IdMascotaAdopcion
+      
+      INNER JOIN pet p 
+        ON ma.IdPet = p.IdPet
+      
+      INNER JOIN tipomascota tm 
+        ON p.IdTipoMascota = tm.IdTipoMascota
+      
+      WHERE sa.IdPersona = ?
+      
+      ORDER BY sa.Fecha_Solicitud DESC;`, [IdPersona]);
+            res.json({
+                status: true,
+                message: 'Todo Ok',
+                data: list
             });
         });
     }
