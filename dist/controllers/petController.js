@@ -105,11 +105,10 @@ class PetController {
         });
     }
     /* pet adopcion */
-    listPetAdoption(req, res) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const { IdPersona } = req.params;
-            const [list] = yield database_1.default.query(`
-        SELECT 
+    /* public async listPetAdoption(req: Request, res: Response){
+      const { IdPersona } = req.params;
+        const [list] = await  pool.query(`
+        SELECT
         p.IdPet,
         p.Nombre,
         p.Apellidos,
@@ -141,6 +140,58 @@ class PetController {
           WHERE IdPersona = ?
         );;
       `, [IdPersona]);
+
+      res.json({
+        data: list,
+        message: 'Todo Ok',
+        status: true
+      })
+    } */
+    listPetAdoption(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdPersona } = req.params;
+            const [list] = yield database_1.default.query(`
+        SELECT 
+        p.IdPet,
+        p.Nombre,
+        p.Apellidos,
+        p.Foto,
+        tm.Descripcion AS TipoMascota,
+        p.Edad,
+        p.Peso,
+        
+        ma.Estado,
+        ma.Fecha_Registro,
+        ma.Lugar_Entrega,
+        ma.Vacunas_Completas,
+        ma.Castrado,
+        ma.Tipo_Adopcion,
+        ma.Costo_Adopcion,
+        ma.Contacto,
+        ma.Descripcion AS Detalle_Adopcion,
+
+        pub.Nombre_Contacto,
+        pub.Telefono_Contacto
+
+      FROM pet p
+
+      INNER JOIN mascota_adopcion ma ON p.IdPet = ma.IdPet
+      INNER JOIN tipomascota tm ON p.IdTipoMascota = tm.IdTipoMascota
+
+      -- 🔥 NUEVO
+      INNER JOIN publicacion pub 
+        ON pub.IdPet = p.IdPet
+
+      WHERE pub.TipoPublicacion = 'adopcion'
+      AND pub.Estado = 'aprobado'
+      AND ma.Estado = 'Disponible'
+
+      AND ma.IdMascotaAdopcion NOT IN (
+        SELECT IdMascotaAdopcion
+        FROM solicitud_adopcion
+        WHERE IdPersona = ?
+      );
+      `, [IdPersona]);
             res.json({
                 data: list,
                 message: 'Todo Ok',
@@ -171,23 +222,34 @@ class PetController {
         ma.Costo_Adopcion,
         ma.Contacto,
         ma.Descripcion AS Detalle_Adopcion,
-        
+
+        pub.Nombre_Contacto,
+        pub.Telefono_Contacto,
+        pub.Relacion,
+
         CASE 
-        WHEN mf.IdPet IS NULL THEN false
-        ELSE true
+          WHEN mf.IdPet IS NULL THEN false
+          ELSE true
         END AS EsFavorito
 
-        FROM pet p
+      FROM pet p
 
-        INNER JOIN mascota_adopcion ma ON p.IdPet = ma.IdPet
-        INNER JOIN tipomascota tm ON p.IdTipoMascota = tm.IdTipoMascota
-        LEFT JOIN favpet mf 
+      INNER JOIN mascota_adopcion ma ON p.IdPet = ma.IdPet
+      INNER JOIN tipomascota tm ON p.IdTipoMascota = tm.IdTipoMascota
+
+      LEFT JOIN favpet mf 
         ON mf.IdPet = p.IdPet AND mf.IdPersona = ?
 
-        WHERE p.Tipo = 'adopcion'
-        AND p.IdPet = ?
-        LIMIT 1 ;
-      `, [IdPersona, IdPet]);
+      -- 🔥 NUEVO JOIN
+      INNER JOIN publicacion pub 
+        ON pub.IdPet = p.IdPet 
+        AND pub.TipoPublicacion = 'adopcion'
+        AND pub.Estado = 'aprobado'
+
+      WHERE p.Tipo = 'adopcion'
+      AND p.IdPet = ?
+      LIMIT 1;
+    `, [IdPersona, IdPet]);
             res.json({
                 data: list,
                 message: 'Todo Ok',
