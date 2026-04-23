@@ -36,6 +36,39 @@ class ComentarioController{
             data: list
         });
     }
+
+    /* COMENTARIOS HACIA LA FUNDACION */
+async getComentarioFundacion(req: Request, res: Response){
+    const { IdFundacion } = req.params;
+
+    const [list] = await pool.query(
+        `SELECT 
+            c.IdComentario, 
+            c.IdPersona, 
+            p.Nombres, 
+            p.Apellidos, 
+            p.Foto, 
+            c.Titulo, 
+            c.Descripcion, 
+            c.Rating, 
+            c.Fecha, 
+            c.comentable_id, 
+            c.comentable_typo, 
+            c.Estado 
+        FROM comentario c 
+        INNER JOIN persona p ON c.IdPersona = p.IdPersona 
+        WHERE c.comentable_typo = ? 
+          AND c.comentable_id = ?`,
+        ['fundacion', IdFundacion]
+    );
+
+    res.json({
+        message: 'Todo Correcto',
+        status: true,
+        data: list
+    });
+}
+
 }
 
 export const comentarioController = new ComentarioController();

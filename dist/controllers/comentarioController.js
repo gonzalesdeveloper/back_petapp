@@ -49,5 +49,33 @@ class ComentarioController {
             });
         });
     }
+    /* COMENTARIOS HACIA LA FUNDACION */
+    getComentarioFundacion(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { IdFundacion } = req.params;
+            const [list] = yield database_1.default.query(`SELECT 
+            c.IdComentario, 
+            c.IdPersona, 
+            p.Nombres, 
+            p.Apellidos, 
+            p.Foto, 
+            c.Titulo, 
+            c.Descripcion, 
+            c.Rating, 
+            c.Fecha, 
+            c.comentable_id, 
+            c.comentable_typo, 
+            c.Estado 
+        FROM comentario c 
+        INNER JOIN persona p ON c.IdPersona = p.IdPersona 
+        WHERE c.comentable_typo = ? 
+          AND c.comentable_id = ?`, ['fundacion', IdFundacion]);
+            res.json({
+                message: 'Todo Correcto',
+                status: true,
+                data: list
+            });
+        });
+    }
 }
 exports.comentarioController = new ComentarioController();
