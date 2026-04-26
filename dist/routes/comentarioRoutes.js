@@ -9,7 +9,7 @@ class ComentarioRoutes {
     }
     config() {
         this.router.get('/listdoc/:IdDoctor', comentarioController_1.comentarioController.getComentarioDoctor);
-        this.router.post('/create', comentarioController_1.comentarioController.createComentarioDoctor);
+        this.router.post('/create', comentarioController_1.comentarioController.createComentario);
         this.router.get('/listvet/:IdVeterinaria', comentarioController_1.comentarioController.getComentarioVet);
         this.router.get('/listfundation/:IdFundacion', comentarioController_1.comentarioController.getComentarioFundacion);
     }
