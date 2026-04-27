@@ -14,7 +14,7 @@ class AdopcionController{
   
       console.log('Inicio transacción');
   
-      // 🔹 1. Validar duplicado
+      // 🔹 1. Validar duplicado 
       const [existe] = await conn.query<RowDataPacket[]>(`
         SELECT * 
         FROM solicitud_adopcion 

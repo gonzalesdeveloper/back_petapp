@@ -23,7 +23,7 @@ class AdopcionController {
             try {
                 yield conn.beginTransaction(); // ✅ CORRECTO
                 console.log('Inicio transacción');
-                // 🔹 1. Validar duplicado
+                // 🔹 1. Validar duplicado 
                 const [existe] = yield conn.query(`
         SELECT * 
         FROM solicitud_adopcion 
