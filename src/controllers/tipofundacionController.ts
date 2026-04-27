@@ -11,5 +11,4 @@ class TipoFundacionController{
         })
     }
 }
-
 export const tipoFundacionController = new TipoFundacionController()
