@@ -25,6 +25,11 @@ import doctorespecialidadRoutes from './routes/doctorespecialidadRoutes';
 import comentarioRoutes from './routes/comentarioRoutes';
 import doctorFavRoutes from './routes/doctorFavRoutes';
 import petFavRoutes from './routes/petFavRoutes';
+import tipofundacionRoutes from './routes/tipofundacionRoutes';
+import fundacionRoutes from './routes/fundacionRoutes';
+import donacionRoutes from './routes/donacionRoutes';
+import adoptionRoutes from './routes/adoptionRoutes';
+import publicacionRoutes from './routes/publicacionRoutes';
 
 export class Server{
     public app: Application;
@@ -32,11 +37,6 @@ export class Server{
         this.app = express();
         this.config();
         this.routes();
-    }
-
-    async listen(){
-        await this.app.listen('3000');
-        console.log("pueeto abierto", 3000);
     }
 
     config(): void{
@@ -69,11 +69,17 @@ export class Server{
         this.app.use('/api/comentario', comentarioRoutes);
         this.app.use('/api/favdoc', doctorFavRoutes);
         this.app.use('/api/favpet', petFavRoutes);
+        this.app.use('/api/tipo_f', tipofundacionRoutes);
+        this.app.use('/api/fundacion', fundacionRoutes);
+        this.app.use('/api/donacion', donacionRoutes);
+        this.app.use('/api/adoption', adoptionRoutes);
+        this.app.use('/api/publicacion', publicacionRoutes);
     }
 
     start(): void{
-        this.app.listen(this.app.get('port'), ()=>{
-            console.log("puerto corriendo en " , this.app.get('port'));
+        const port = this.app.get('port');
+        this.app.listen(port, () => {
+          console.log('✅ Servidor corriendo en puerto', port);
         });
     }
 }
