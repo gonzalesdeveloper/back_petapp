@@ -11,15 +11,15 @@ dotenv_1.default.config();
 function verifyToken(req, res, next) {
     const token = req.headers['authorization'];
     if (!token) {
-        return res.status(403).json({ message: 'Token requerido' });
+        res.status(403).json({ message: 'Token requerido' });
+        return;
     }
     const bearerToken = token.toString().replace('Bearer ', '');
     jsonwebtoken_1.default.verify(bearerToken, process.env.ACCESS_SECRET || 'secret', (err, decoded) => {
         if (err) {
             return res.status(401).json({ message: 'Token inválido' });
         }
-        res.locals.user = decoded;
-        /* req.body.user = decoded */
+        req.user = decoded;
         next();
     });
 }

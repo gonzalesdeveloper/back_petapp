@@ -49,6 +49,8 @@ export class Server{
 
     routes(): void{
         this.app.use('/api/auth', authRoutes);
+        /* for photos */
+        this.app.use('/uploads', express.static('uploads'));
         /* verifica si el token existe o si ya venció */
         this.app.use( verifyToken as express.RequestHandler);
         this.app.use('/api/pet', petRoutes);

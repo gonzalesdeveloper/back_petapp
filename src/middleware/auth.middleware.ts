@@ -9,7 +9,8 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
     const token = req.headers['authorization'];
 
     if (!token) {
-        return res.status(403).json({ message: 'Token requerido' });
+        res.status(403).json({ message: 'Token requerido' });
+        return;
     }
 
     const bearerToken = token.toString().replace('Bearer ', '');
@@ -18,9 +19,7 @@ export function verifyToken(req: Request, res: Response, next: NextFunction) {
         if (err) {
             return res.status(401).json({ message: 'Token inválido' });
         }
-
-        res.locals.user = decoded;
-        /* req.body.user = decoded */
+        (req as any).user = decoded;
         next();
     });
 }

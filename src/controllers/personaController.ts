@@ -57,11 +57,12 @@ class PersonaController{
 
             let accessToken: string | null = null;
             let refreshToken: string | null = null;
+            let userLog: any = null;
 
             if (requiereToken) {
                 // Obtener persona actualizada
                 const [rows]: any = await pool.query(
-                  'SELECT IdPersona, Email, Nombres, Apellidos FROM persona WHERE IdPersona = ?',
+                  'SELECT IdPersona, Email, Nombres, Apellidos, Foto FROM persona WHERE IdPersona = ?',
                   [IdPersona]
                 );
           
@@ -70,9 +71,9 @@ class PersonaController{
                 const payload = {
                   IdPersona: persona.IdPersona,
                   Email: persona.Email,
-                  Nombres: persona.Nombres,
-                  Apellidos: persona.Apellidos
                 };
+
+                userLog = { IdPersona: persona.IdPersona, Email: persona.Email, Nombres: persona.Nombres, Apellidos: persona.Apellidos, Foto: persona.Foto }
           
                 accessToken = generateAccessToken(payload);
                 refreshToken = generateRefreshToken(payload);
@@ -82,7 +83,8 @@ class PersonaController{
               status: true,
               message: 'Usuario Actualizado',
               accessToken,
-              refreshToken
+              refreshToken,
+              userLog
             });
         } catch (error) {
             console.log(error);
@@ -92,6 +94,32 @@ class PersonaController{
             });
         }
     }
+
+    /* EDIT PHOTO */
+    public async editPhoto(req: any, res: Response) {
+        try {
+            const IdPersona = req.user.IdPersona; // o desde token (mejor)
+      
+          if (!req.file) {
+            return res.status(400).json({ error: 'No se envió imagen' });
+          }
+      
+          const filePath = req.file.path; // 🔥 AQUÍ está la ruta real
+      
+          await pool.query(
+            'UPDATE persona SET Foto = ? WHERE IdPersona = ?',
+            [filePath, IdPersona]
+          );
+      
+          res.json({
+            message: 'Foto actualizada',
+            foto: filePath
+          });
+      
+        } catch (error) {
+          res.status(500).json({ error: 'Error al subir foto' });
+        }
+      }
 }
 
 export const personaController = new PersonaController();

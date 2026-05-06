@@ -31,14 +31,21 @@ class AuthController{
 
           if (!match) return res.status(401).json({ error: 'Contraseña incorrecta' });
 
-          const payload = { IdPersona: user.IdPersona, Email: user.Email, Nombres: user.Nombres, Apellidos: user.Apellidos };
+          const payload = { IdPersona: user.IdPersona, Email: user.Email };
           const accessToken = generateAccessToken(payload);
           const refreshToken = generateRefreshToken(payload);
 
           res.json({
             message: 'Logeo exitoso',
             accessToken,
-            refreshToken
+            refreshToken,
+            userLog:{
+              IdPersona: user.IdPersona,
+              Email: user.Email,
+              Nombres: user.Nombres,
+              Apellidos: user.Apellidos,
+              Foto: user.Foto
+            }
           });
     
         } catch (error) {
@@ -49,37 +56,73 @@ class AuthController{
     }
 
     /* REGISTER NORMAL */
-    public async register(req: Request, res: Response){
-      
+    public async register(req: Request, res: Response): Promise<any> {
       const { IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, Password, Estado } = req.body;
+    
       try {
-            const hashedPassword = await bcrypt.hash(Password, saltRounds);
-
-            await pool.query(
-            'INSERT INTO persona (IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, Password, Estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, hashedPassword, Estado]
-            );
-            res.status(201).json({ 
-              message: 'Usuario registrado',
-            });
-        } catch (error) {
-            res.status(500).json({ 
-              error: 'Error al registrar usuario'
-            });
+    
+        // 🔍 Verificar si ya existe
+        const [rows]: any = await pool.query(
+          'SELECT * FROM persona WHERE Email = ?', 
+          [Email]
+        );
+    
+        if (rows.length > 0) {
+          return res.status(400).json({ error: 'El usuario ya existe' });
         }
+    
+        // 🔐 Encriptar contraseña
+        const hashedPassword = await bcrypt.hash(Password, saltRounds);
+    
+        // 💾 Insertar usuario
+        const [result]: any = await pool.query(
+          'INSERT INTO persona (IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, Password, Estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          [IdTipoPersona, IdTipoDocumento, NumDocumento, Nombres, Apellidos, Direccion, Referencia, Ciudad, Nacimiento, Email, Foto, Usuario, hashedPassword, Estado]
+          );
+    
+        const userLog = {
+          IdPersona: result.insertId,
+          Email,
+          Nombres,
+          Apellidos
+        };
+    
+        // 🔑 Generar tokens (igual que login)
+        const accessToken = generateAccessToken(userLog);
+        const refreshToken = generateRefreshToken(userLog);
+    
+        res.json({
+          message: 'Usuario registrado correctamente',
+          accessToken,
+          refreshToken,
+          userLog
+        });
+    
+      } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Error en el registro' });
+      }
     }
 
-    public async refreshToken(req: Request, res: Response){
-      // Ruta para refrescar token
+    public async refreshToken(req: Request, res: Response): Promise<any>{
       const { refreshToken } = req.body;
+    
+      if (!refreshToken) {
+        return res.status(403).json({ error: 'No refresh token' });
+      }
+    
       try {
-        const payload: any = jwt.verify(refreshToken, refresh); // otro secreto
-        
-        const newAccessToken = generateAccessToken({ IdPersona: payload.IdPersona, Email: payload.Email, Nombres: payload.Nombres, Apellidos: payload.Apellidos });
-        /* const newAccessToken = jwt.sign({ IdPersona: payload.IdPersona }, access, { expiresIn: '15m' }); */
+        const payload: any = jwt.verify(refreshToken, refresh);
+    
+        const newAccessToken = generateAccessToken({
+          IdPersona: payload.IdPersona,
+          Email: payload.Email
+        });
+    
         res.json({ accessToken: newAccessToken });
+    
       } catch {
-        res.status(401).json({ error: 'Refresh token inválido o expirado' });
+        res.status(403).json({ error: 'Refresh token inválido o expirado' });
       }
     }
 }

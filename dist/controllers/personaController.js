@@ -69,16 +69,16 @@ class PersonaController {
                 const requiereToken = camposToken.some(campo => campo in data);
                 let accessToken = null;
                 let refreshToken = null;
+                let userLog = null;
                 if (requiereToken) {
                     // Obtener persona actualizada
-                    const [rows] = yield database_1.default.query('SELECT IdPersona, Email, Nombres, Apellidos FROM persona WHERE IdPersona = ?', [IdPersona]);
+                    const [rows] = yield database_1.default.query('SELECT IdPersona, Email, Nombres, Apellidos, Foto FROM persona WHERE IdPersona = ?', [IdPersona]);
                     const persona = rows[0];
                     const payload = {
                         IdPersona: persona.IdPersona,
                         Email: persona.Email,
-                        Nombres: persona.Nombres,
-                        Apellidos: persona.Apellidos
                     };
+                    userLog = { IdPersona: persona.IdPersona, Email: persona.Email, Nombres: persona.Nombres, Apellidos: persona.Apellidos, Foto: persona.Foto };
                     accessToken = (0, token_util_1.generateAccessToken)(payload);
                     refreshToken = (0, token_util_1.generateRefreshToken)(payload);
                 }
@@ -86,7 +86,8 @@ class PersonaController {
                     status: true,
                     message: 'Usuario Actualizado',
                     accessToken,
-                    refreshToken
+                    refreshToken,
+                    userLog
                 });
             }
             catch (error) {
@@ -94,6 +95,26 @@ class PersonaController {
                 res.status(500).json({
                     error: 'Error al Actualizar Usuario'
                 });
+            }
+        });
+    }
+    /* EDIT PHOTO */
+    editPhoto(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const IdPersona = req.user.IdPersona; // o desde token (mejor)
+                if (!req.file) {
+                    return res.status(400).json({ error: 'No se envió imagen' });
+                }
+                const filePath = req.file.path; // 🔥 AQUÍ está la ruta real
+                yield database_1.default.query('UPDATE persona SET Foto = ? WHERE IdPersona = ?', [filePath, IdPersona]);
+                res.json({
+                    message: 'Foto actualizada',
+                    foto: filePath
+                });
+            }
+            catch (error) {
+                res.status(500).json({ error: 'Error al subir foto' });
             }
         });
     }
