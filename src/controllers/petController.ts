@@ -227,7 +227,7 @@ class PetController{
 
   async listMyAdoptions(req: Request, res: Response){
     const { IdPersona } = req.params;
-    const [ list ] = await pool.query(`SELECT sa.IdSolicitud, sa.Estado_Solicitud, sa.Fecha_Solicitud, p.Nombre, p.Edad, p.Foto,
+    const [ list ] = await pool.query(`SELECT sa.IdSolicitud, sa.Estado_Solicitud, sa.Fecha_Solicitud, p.Nombre, p.Apellidos, p.Edad, p.Foto,
     tm.Descripcion AS TipoMascota, p.Peso
     
     FROM solicitud_adopcion sa

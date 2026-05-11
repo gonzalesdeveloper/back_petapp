@@ -18,7 +18,40 @@ class DoctorController {
     getDoctorsHome(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
-            const [list] = yield database_1.default.query('SELECT d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Referencia, p.Foto, d.Presentacion, d.Rating, CASE WHEN df.IdPersona IS NULL THEN false ELSE true END AS IsFavourite FROM doctor d INNER JOIN persona p ON d.IdPersona = p.IdPersona LEFT JOIN favdoc df ON d.IdDoctor = df.IdDoctor AND df.IdPersona = ?', [IdPersona]);
+            const [list] = yield database_1.default.query(`
+            SELECT 
+                d.IdDoctor,
+                p.Nombres,
+                p.Apellidos,
+                p.Direccion,
+                p.Referencia,
+                p.Foto,
+                d.Presentacion,
+                d.Rating,
+    
+                COUNT(c.IdComentario) AS TotalComentarios,
+    
+                CASE 
+                    WHEN df.IdPersona IS NULL THEN false 
+                    ELSE true 
+                END AS IsFavourite
+    
+            FROM doctor d
+    
+            INNER JOIN persona p 
+                ON d.IdPersona = p.IdPersona
+    
+            LEFT JOIN favdoc df 
+                ON d.IdDoctor = df.IdDoctor 
+                AND df.IdPersona = ?
+    
+            LEFT JOIN comentario c
+                ON d.IdDoctor = c.comentable_id
+                AND c.comentable_typo = 'doctor'
+    
+            GROUP BY d.IdDoctor
+    
+        `, [IdPersona]);
             res.json({
                 message: 'Todo Correcto',
                 status: true,
