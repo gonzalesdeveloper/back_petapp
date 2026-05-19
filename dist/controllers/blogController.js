@@ -29,8 +29,10 @@ class BlogController {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdBlog } = req.params;
             const [list] = yield database_1.default.query('SELECT * FROM BLOG WHERE IdBlog = ?', [IdBlog]);
+            const [Fotos] = yield database_1.default.query('SELECT * FROM blog_foto WHERE IdBlog = ?', [IdBlog]);
+            const data = [Object.assign(Object.assign({}, list[0]), { Fotos })];
             res.json({
-                data: list,
+                data,
                 status: true,
                 message: 'Todo Correcto'
             });
