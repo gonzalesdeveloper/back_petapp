@@ -25,7 +25,7 @@ class DonacionController{
 
     async listDonacion(req: Request, res: Response){
         const { IdPersona } = req.params;
-        const [ list ] : any[] = await pool.query('SELECT d.IdDonacion, d.Tipo_Moneda, d.Monto, d.MetodoPago, d.Fecha, d.Estado, f.Nombre   AS Fundacion, f.Ubicacion FROM donacion d INNER JOIN fundacion f ON d.IdFundacion = f.IdFundacion WHERE d.IdPersona = ?', [ IdPersona ]);
+        const [ list ] : any[] = await pool.query('SELECT d.IdDonacion, d.Tipo_Moneda, d.Monto, d.MetodoPago, d.Fecha, d.Estado, f.Nombre   AS Fundacion, f.Img_Principal , f.Ubicacion FROM donacion d INNER JOIN fundacion f ON d.IdFundacion = f.IdFundacion WHERE d.IdPersona = ?', [ IdPersona ]);
         
         const Pendientes = list.filter((d: any) => d.Estado === 'pendiente');
         const Aprobadas  = list.filter((d: any) => d.Estado === 'aprobado');

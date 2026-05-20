@@ -39,7 +39,7 @@ class DonacionController {
     listDonacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
-            const [list] = yield database_1.default.query('SELECT d.IdDonacion, d.Tipo_Moneda, d.Monto, d.MetodoPago, d.Fecha, d.Estado, f.Nombre   AS Fundacion, f.Ubicacion FROM donacion d INNER JOIN fundacion f ON d.IdFundacion = f.IdFundacion WHERE d.IdPersona = ?', [IdPersona]);
+            const [list] = yield database_1.default.query('SELECT d.IdDonacion, d.Tipo_Moneda, d.Monto, d.MetodoPago, d.Fecha, d.Estado, f.Nombre   AS Fundacion, f.Img_Principal , f.Ubicacion FROM donacion d INNER JOIN fundacion f ON d.IdFundacion = f.IdFundacion WHERE d.IdPersona = ?', [IdPersona]);
             const Pendientes = list.filter((d) => d.Estado === 'pendiente');
             const Aprobadas = list.filter((d) => d.Estado === 'aprobado');
             const Rechazadas = list.filter((d) => d.Estado === 'rechazado');

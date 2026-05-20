@@ -18,7 +18,34 @@ class DoctorFavController {
     listDoctorFav(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
-            const [list] = yield database_1.default.query('SELECT d.IdDoctor, p.Nombres, p.Apellidos, d.Presentacion, p.Foto, d.Rating from doctor d INNER JOIN persona p ON d.IdPersona = p.IdPersona INNER JOIN  favdoc fav ON d.IdDoctor = fav.IdDoctor WHERE fav.IdPersona = ?', [IdPersona]);
+            const [list] = yield database_1.default.query(`
+            SELECT 
+                d.IdDoctor,
+                p.Nombres,
+                p.Apellidos,
+                d.Presentacion,
+                p.Foto,
+                d.Rating,
+    
+                COUNT(c.IdComentario) AS TotalComentarios
+    
+            FROM doctor d
+    
+            INNER JOIN persona p 
+                ON d.IdPersona = p.IdPersona
+    
+            INNER JOIN favdoc fav 
+                ON d.IdDoctor = fav.IdDoctor
+    
+            LEFT JOIN comentario c 
+                ON c.comentable_id = d.IdDoctor
+                AND c.comentable_typo = 'doctor'
+    
+            WHERE fav.IdPersona = ?
+    
+            GROUP BY d.IdDoctor
+    
+        `, [IdPersona]);
             res.json({
                 status: true,
                 message: 'Todo correcto',
