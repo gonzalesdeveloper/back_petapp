@@ -28,7 +28,7 @@ class BlogController {
     getBlogOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdBlog } = req.params;
-            const [list] = yield database_1.default.query('SELECT * FROM Blog WHERE IdBlog = ?', [IdBlog]);
+            const [list] = yield database_1.default.query('SELECT * FROM blog WHERE IdBlog = ?', [IdBlog]);
             const [Fotos] = yield database_1.default.query('SELECT * FROM blog_foto WHERE IdBlog = ?', [IdBlog]);
             const data = [Object.assign(Object.assign({}, list[0]), { Fotos })];
             res.json({
