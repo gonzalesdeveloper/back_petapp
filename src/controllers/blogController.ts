@@ -13,7 +13,7 @@ class BlogController{
 
     public async getBlogOne(req: Request, res: Response){
         const { IdBlog } = req.params;
-        const [list] : any = await pool.query('SELECT * FROM BLOG WHERE IdBlog = ?', [IdBlog]);
+        const [list] : any = await pool.query('SELECT * FROM Blog WHERE IdBlog = ?', [IdBlog]);
         const [Fotos]: any = await pool.query('SELECT * FROM blog_foto WHERE IdBlog = ?', [IdBlog]);
         const data = [{ ...list[0], Fotos }]
         res.json({
