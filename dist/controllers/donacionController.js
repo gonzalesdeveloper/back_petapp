@@ -18,7 +18,19 @@ class DonacionController {
     insertDonacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdFundacion, IdPersona, Tipo_Moneda, Monto, MetodoPago, Mensaje } = req.body;
-            yield database_1.default.query('INSERT INTO donacion (IdFundacion, IdPersona, Tipo_Moneda, Monto, MetodoPago, Mensaje) values (?,?,?,?,?,?)', [IdFundacion, IdPersona, Tipo_Moneda, Monto, MetodoPago, Mensaje]);
+            const comprobante = req.file ? req.file.path : null;
+            yield database_1.default.query(`
+            INSERT INTO donacion (
+                IdFundacion,
+                IdPersona,
+                Tipo_Moneda,
+                Monto,
+                MetodoPago,
+                Mensaje,
+                Comprobante
+            )
+            VALUES (?,?,?,?,?,?,?)
+        `, [IdFundacion, IdPersona || null, Tipo_Moneda, Monto, MetodoPago, Mensaje, comprobante]);
             res.json({
                 status: true,
                 message: 'Guardado con Éxito'

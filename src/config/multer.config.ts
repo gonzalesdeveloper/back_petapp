@@ -1,16 +1,35 @@
 import multer from 'multer';
 import path from 'path';
+import fs from 'fs';
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/users/');
-  },
-  filename: (req: any, file, cb) => {
-    const userId = req.user?.IdPersona || Date.now();
+export const createUpload = (folder: string, prefix: string) => {
 
-    const ext = path.extname(file.originalname);
-    cb(null, `user-${userId}${ext}`);
-  }
-});
+  const storage = multer.diskStorage({
 
-export const upload = multer({ storage });
+    destination: (req, file, cb) => {
+
+      const uploadPath = `uploads/${folder}`;
+
+      if (!fs.existsSync(uploadPath)) {
+        fs.mkdirSync(uploadPath, { recursive: true });
+      }
+
+      cb(null, uploadPath);
+    },
+
+    filename: (req, file, cb) => {
+
+      const ext = path.extname(file.originalname);
+
+      cb(
+        null,
+        `${prefix}-${Date.now()}${ext}`
+      );
+
+    }
+
+  });
+
+  return multer({ storage });
+
+};

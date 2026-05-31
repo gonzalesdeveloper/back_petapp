@@ -3,13 +3,28 @@ import pool from "../database";
 
 class DonacionController{
     async insertDonacion(req: Request, res: Response){
+
         const { IdFundacion, IdPersona, Tipo_Moneda, Monto, MetodoPago, Mensaje } = req.body;
-        await pool.query('INSERT INTO donacion (IdFundacion, IdPersona, Tipo_Moneda, Monto, MetodoPago, Mensaje) values (?,?,?,?,?,?)'
-                        , [ IdFundacion, IdPersona, Tipo_Moneda, Monto, MetodoPago, Mensaje ]);
+    
+        const comprobante = req.file ? req.file.path : null;
+    
+        await pool.query(`
+            INSERT INTO donacion (
+                IdFundacion,
+                IdPersona,
+                Tipo_Moneda,
+                Monto,
+                MetodoPago,
+                Mensaje,
+                Comprobante
+            )
+            VALUES (?,?,?,?,?,?,?)
+        `,[ IdFundacion, IdPersona || null, Tipo_Moneda, Monto, MetodoPago, Mensaje, comprobante ]);
+    
         res.json({
             status: true,
             message: 'Guardado con Éxito'
-        })
+        });
     }
 
     async listMetodoDonacion(req: Request, res: Response){

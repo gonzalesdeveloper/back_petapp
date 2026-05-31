@@ -1,7 +1,10 @@
 import { Router } from "express";
-import { upload } from "../config/multer.config";
 import { personaController } from "../controllers/personaController";
 import { verifyToken } from "../middleware/auth.middleware";
+import { createUpload } from '../config/multer.config';
+
+export const uploadUser =
+  createUpload('users', 'user');
 
 
 class PersonaRoutes{
@@ -18,7 +21,7 @@ class PersonaRoutes{
         this.router.put(
             '/update-photo',
             verifyToken,
-            upload.single('photo'),
+            uploadUser.single('photo'),
             (req, res) => {
               personaController.editPhoto(req, res);
             }

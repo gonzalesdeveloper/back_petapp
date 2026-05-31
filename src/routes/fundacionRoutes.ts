@@ -10,7 +10,7 @@ class FundacionRoutes{
 
     config(): void{
         this.router.get('/list', fundacionController.getFundations);
-        this.router.get('/listselect', fundacionController.getFundations);
+        this.router.get('/listselect', fundacionController.getFundationsSelect);
         this.router.get('/listone/:IdFundacion', fundacionController.getOneFundation);
     }
 }

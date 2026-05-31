@@ -12,7 +12,14 @@ class FundacionController{
     }
 
     public async getFundationsSelect(req: Request, res: Response){
-        const [list] = await pool.query('SELECT IdFundacion, Nombre FROM fundacion');
+        const [list] = await pool.query(`
+            SELECT DISTINCT 
+                f.IdFundacion, 
+                f.Nombre 
+            FROM fundacion f
+            INNER JOIN donacionfundacion df 
+                ON df.IdFundacion = f.IdFundacion
+        `);
         res.json({
             status: true,
             message: 'Todo Ok',
