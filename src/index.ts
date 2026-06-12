@@ -30,6 +30,7 @@ import fundacionRoutes from './routes/fundacionRoutes';
 import donacionRoutes from './routes/donacionRoutes';
 import adoptionRoutes from './routes/adoptionRoutes';
 import publicacionRoutes from './routes/publicacionRoutes';
+import bannerRoutes from './routes/bannerRoutes';
 
 export class Server{
     public app: Application;
@@ -76,6 +77,7 @@ export class Server{
         this.app.use('/api/donacion', donacionRoutes);
         this.app.use('/api/adoption', adoptionRoutes);
         this.app.use('/api/publicacion', publicacionRoutes);
+        this.app.use('/api/banner', bannerRoutes);
     }
 
     start(): void{

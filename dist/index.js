@@ -34,6 +34,7 @@ const fundacionRoutes_1 = __importDefault(require("./routes/fundacionRoutes"));
 const donacionRoutes_1 = __importDefault(require("./routes/donacionRoutes"));
 const adoptionRoutes_1 = __importDefault(require("./routes/adoptionRoutes"));
 const publicacionRoutes_1 = __importDefault(require("./routes/publicacionRoutes"));
+const bannerRoutes_1 = __importDefault(require("./routes/bannerRoutes"));
 class Server {
     constructor() {
         this.app = (0, express_1.default)();
@@ -76,6 +77,7 @@ class Server {
         this.app.use('/api/donacion', donacionRoutes_1.default);
         this.app.use('/api/adoption', adoptionRoutes_1.default);
         this.app.use('/api/publicacion', publicacionRoutes_1.default);
+        this.app.use('/api/banner', bannerRoutes_1.default);
     }
     start() {
         const port = this.app.get('port');
