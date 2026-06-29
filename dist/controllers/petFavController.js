@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.petFavController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class PetFavController {
     getFavPet(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -31,37 +32,22 @@ class PetFavController {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona, IdPet } = req.body;
             if (!IdPersona || !IdPet) {
-                return res.status(400).json({
-                    status: false,
-                    message: 'Se requiere IdPersona e IdMascota'
-                });
+                return (0, response_helper_1.errorResponse)(res, 'Se Requiere IdPersona e IdMascota', 400);
             }
             try {
                 const [rows] = yield database_1.default.query('SELECT * FROM favpet WHERE IdPersona = ? AND IdPet = ?', [IdPersona, IdPet]);
                 if (rows.length > 0) {
                     yield database_1.default.query('DELETE FROM favpet WHERE IdPersona = ? AND IdPet = ?', [IdPersona, IdPet]);
-                    return res.json({
-                        status: true,
-                        favorite: false,
-                        message: 'Eliminado de favoritos'
-                    });
+                    return (0, response_helper_1.successResponse)(res, 'Eliminado de Favoritos', { favorite: false });
                 }
                 else {
                     yield database_1.default.query('INSERT INTO favpet (IdPersona, IdPet) VALUES (?, ?)', [IdPersona, IdPet]);
-                    return res.json({
-                        status: true,
-                        favorite: true,
-                        message: 'Marcado como favorito'
-                    });
+                    return (0, response_helper_1.successResponse)(res, 'Marcado como favorito', { favorite: true });
                 }
             }
             catch (error) {
-                console.error('Error en mascotaFavorita:', error);
-                return res.status(500).json({
-                    status: false,
-                    message: 'Error en el servidor',
-                    error: error.message
-                });
+                console.log('petfav', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error Interno');
             }
         });
     }

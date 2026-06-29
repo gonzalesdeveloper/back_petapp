@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import pool from "../database";
 import { ResultSetHeader, RowDataPacket } from "mysql2";
+import { errorResponse, successResponse } from "../helpers/response.helper";
 
 class AdopcionController{
   async setStateAdoption(req: Request, res: Response): Promise<any> {
@@ -12,8 +13,6 @@ class AdopcionController{
     try {
       await conn.beginTransaction(); // ✅ CORRECTO
   
-      console.log('Inicio transacción');
-  
       // 🔹 1. Validar duplicado
       const [existe] = await conn.query<RowDataPacket[]>(`
         SELECT * 
@@ -21,14 +20,9 @@ class AdopcionController{
         WHERE IdPersona = ? AND IdMascotaAdopcion = ?
       `,[IdPersona, IdMascotaAdopcion]);
   
-      console.log('Existe:', existe);
-  
       if(existe.length > 0){
         await conn.rollback();
-        return res.status(409).json({
-          ok: false,
-          message: "Ya existe una solicitud para esta mascota"
-        });
+        return errorResponse(res, 'Ya Existe una solicitud para esta mascota', 409);
       }
   
       // 🔹 2. Validar estado mascota
@@ -38,22 +32,14 @@ class AdopcionController{
         WHERE IdMascotaAdopcion = ?
       `,[IdMascotaAdopcion]);
   
-      console.log('Estado mascota:', estadoMascota);
-  
       if(!estadoMascota.length){
         await conn.rollback();
-        return res.status(404).json({
-          ok:false,
-          message:'Mascota no encontrada'
-        });
+        return errorResponse(res, 'Mascota no encontrada', 404);
       }
   
       if(estadoMascota[0].Estado === 'Adoptado'){
         await conn.rollback();
-        return res.status(409).json({
-          ok: false,
-          message: "La mascota ya fue adoptada"
-        });
+        return errorResponse(res, 'Las Mascota ya fue Adoptada', 409);
       }
   
       // 🔹 3. Insertar solicitud
@@ -65,8 +51,6 @@ class AdopcionController{
   
       const IdSolicitud = result.insertId;
   
-      console.log('Solicitud creada:', IdSolicitud);
-  
       // 🔹 4. Insertar historial
       await conn.query(`
         INSERT INTO adopcion_historial
@@ -74,29 +58,17 @@ class AdopcionController{
         VALUES (?, NULL, 'Pendiente', NOW())
       `,[IdSolicitud]);
   
-      console.log('Historial insertado');
-  
       await conn.commit();
-  
-      console.log('Commit OK');
-  
-      return res.json({
-        ok: true,
-        message: "Solicitud enviada correctamente",
-        IdSolicitud
-      });
+      
+      return successResponse(res, 'Solicitud Enviada Correctamente', { IdSolicitud });
   
     } catch (error: any) {
   
-      console.error('ERROR BACKEND:', error);
+      console.error('Adoption Solicitud:', error);
   
       await conn.rollback();
-  
-      return res.status(500).json({
-        ok: false,
-        message: "Error interno del servidor",
-        detail: error.message
-      });
+
+      return errorResponse(res, 'Error interno del servidor');
   
     } finally {
   
@@ -129,8 +101,6 @@ class AdopcionController{
       });
   }
   
-
-
   async actualizarEstadoSolicitud(req: Request, res: Response){
 
     const { IdSolicitud, EstadoNuevo } = req.body;
@@ -168,7 +138,7 @@ class AdopcionController{
   
       await conn.commit();
   
-      res.json({ ok:true });
+      res.json({ status:true });
   
     }catch(error){
   

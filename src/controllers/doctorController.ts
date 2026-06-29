@@ -1,5 +1,7 @@
 import { json, Request, Response } from "express";
+import { RowDataPacket } from "mysql2";
 import pool from "../database";
+import { errorResponse, successResponse } from "../helpers/response.helper";
 
 class DoctorController{
     async getDoctorsHome(req: Request, res: Response){
@@ -48,12 +50,14 @@ class DoctorController{
     }
     async getDetailDoctor(req: Request, res: Response){
         const { IdDoctor } = req.params;
-        const [list] = await pool.query('SELECT p.IdPersona, d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Foto, p.Referencia, d.Rating, d.Presentacion FROM `persona` p inner join doctor d on p.IdPersona = d.IdPersona WHERE d.IdDoctor = ?', [IdDoctor]);
-        res.json({
-            message: 'Todo Correcto',
-            status: true,
-            data: list
-        });
+        try{
+            const [list] = await pool.query<RowDataPacket[]>('SELECT p.IdPersona, d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Foto, p.Referencia, d.Rating, d.Presentacion FROM `persona` p inner join doctor d on p.IdPersona = d.IdPersona WHERE d.IdDoctor = ?', [IdDoctor]);
+            if ( list.length === 0) return errorResponse(res, 'No se encontró el registro', 404);
+            return successResponse(res, 'Registro Encontrado', list);
+        }catch(error){
+            console.log('One Doctor Detail', error);
+            return errorResponse(res, 'Error del Servidor');
+        }
     }
 
     async doctorFavorito(req: Request, res: Response): Promise<any> {

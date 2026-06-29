@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+import { RowDataPacket } from "mysql2";
 import pool from "../database";
+import { errorResponse, successResponse } from "../helpers/response.helper";
 
 
 class PetController{
@@ -167,9 +169,10 @@ class PetController{
     })
   }
 
-  public async listPetOneAdoption(req:Request, res: Response){
+  public async listPetOneAdoption(req:Request, res: Response):Promise<any>{
+    try{
       const { IdPersona , IdPet } = req.params;
-      const [list] = await  pool.query(`
+      const [list] = await  pool.query<RowDataPacket[]>(`
         SELECT 
         p.IdPet,
         p.Nombre,
@@ -218,11 +221,15 @@ class PetController{
       LIMIT 1;
     `, [IdPersona, IdPet]);
 
-    res.json({
-      data: list,
-      message: 'Todo Ok',
-      status: true
-    })
+    if (list.length === 0) return errorResponse(res, 'Mascota no encontrada', 404);
+
+    return successResponse(res, 'Todo Ok', list);
+
+    }catch(error){
+      console.log('List PetOne Adoption', error);
+      
+      return errorResponse(res, 'Error interno del servidor');
+    }
   }
 
   async listMyAdoptions(req: Request, res: Response){

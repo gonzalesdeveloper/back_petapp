@@ -14,16 +14,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.doctorespecialistaController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class DoctorEspecialidadController {
     listDoctorEspecialidad(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdDoctor } = req.params;
-            const [list] = yield database_1.default.query('SELECT d.IdDoctor, e.Descripcion, e.Lugar_Estudios, e.Icono from doctor d INNER JOIN doctor_especialidad de ON d.IdDoctor = de.IdDoctor INNER JOIN especialidad e ON de.IdEspecialidad = e.IdEspecialidad WHERE d.IdDoctor = ?', [IdDoctor]);
-            res.json({
-                message: 'Todo ok',
-                status: true,
-                data: list
-            });
+            try {
+                const [list] = yield database_1.default.query('SELECT d.IdDoctor, e.Descripcion, e.Lugar_Estudios, e.Icono from doctor d INNER JOIN doctor_especialidad de ON d.IdDoctor = de.IdDoctor INNER JOIN especialidad e ON de.IdEspecialidad = e.IdEspecialidad WHERE d.IdDoctor = ?', [IdDoctor]);
+                return (0, response_helper_1.successResponse)(res, 'Listado Correcto', list);
+            }
+            catch (error) {
+                console.log('Listado Especialidades Doctor', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error en el Servidor');
+            }
         });
     }
 }

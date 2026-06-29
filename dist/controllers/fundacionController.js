@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fundacionController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class FundacionController {
     getFundations(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -48,25 +49,15 @@ class FundacionController {
                 const { IdFundacion } = req.params;
                 const [fundacionRows] = yield database_1.default.query('SELECT * FROM fundacion WHERE IdFundacion = ?', [IdFundacion]);
                 if (fundacionRows.length === 0) {
-                    res.status(404).json({
-                        status: false,
-                        message: 'Fundación no encontrada'
-                    });
-                    return;
+                    return (0, response_helper_1.errorResponse)(res, 'Fundacion no encontrada', 404);
                 }
                 const [fotosRows] = yield database_1.default.query('SELECT * FROM fundacion_foto WHERE IdFundacion = ?', [IdFundacion]);
                 fundacionRows[0].Fotos = fotosRows;
-                res.json({
-                    status: true,
-                    message: 'Todo Ok',
-                    data: fundacionRows
-                });
+                return (0, response_helper_1.successResponse)(res, 'Fundacion Encontrada', fundacionRows);
             }
             catch (error) {
-                res.status(500).json({
-                    status: false,
-                    message: 'Error del servidor'
-                });
+                console.log('Fundacion Unica', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
             }
         });
     }

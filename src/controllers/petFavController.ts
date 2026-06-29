@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
+import { RowDataPacket } from "mysql2";
 import pool from "../database";
+import { errorResponse, successResponse } from "../helpers/response.helper";
 
 class PetFavController{
     async getFavPet(req: Request, res: Response){
@@ -17,14 +19,11 @@ class PetFavController{
         const { IdPersona, IdPet } = req.body;
     
         if (!IdPersona || !IdPet) {
-            return res.status(400).json({
-                status: false,
-                message: 'Se requiere IdPersona e IdMascota'
-            });
+            return errorResponse(res, 'Se Requiere IdPersona e IdMascota', 400);
         }
     
         try {
-            const [rows]: any = await pool.query(
+            const [rows] = await pool.query<RowDataPacket[]>(
                 'SELECT * FROM favpet WHERE IdPersona = ? AND IdPet = ?',
                 [IdPersona, IdPet]
             );
@@ -34,33 +33,21 @@ class PetFavController{
                     'DELETE FROM favpet WHERE IdPersona = ? AND IdPet = ?',
                     [IdPersona, IdPet]
                 );
-    
-                return res.json({
-                    status: true,
-                    favorite: false,
-                    message: 'Eliminado de favoritos'
-                });
+                
+                return successResponse(res, 'Eliminado de Favoritos', { favorite: false });
     
             } else {
                 await pool.query(
                     'INSERT INTO favpet (IdPersona, IdPet) VALUES (?, ?)',
                     [IdPersona, IdPet]
                 );
-    
-                return res.json({
-                    status: true,
-                    favorite: true,
-                    message: 'Marcado como favorito'
-                });
+                
+                return successResponse(res, 'Marcado como favorito', { favorite: true })
             }
     
-        } catch (error: any) {
-            console.error('Error en mascotaFavorita:', error);
-            return res.status(500).json({
-                status: false,
-                message: 'Error en el servidor',
-                error: error.message
-            });
+        } catch (error) {
+            console.log('petfav', error);
+            return errorResponse(res, 'Error Interno');
         }
     }
     

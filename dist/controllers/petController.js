@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.petController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class PetController {
     /* pet lost */
     listPetOneLost(req, res) {
@@ -180,8 +181,9 @@ class PetController {
     }
     listPetOneAdoption(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { IdPersona, IdPet } = req.params;
-            const [list] = yield database_1.default.query(`
+            try {
+                const { IdPersona, IdPet } = req.params;
+                const [list] = yield database_1.default.query(`
         SELECT 
         p.IdPet,
         p.Nombre,
@@ -229,11 +231,14 @@ class PetController {
       AND p.IdPet = ?
       LIMIT 1;
     `, [IdPersona, IdPet]);
-            res.json({
-                data: list,
-                message: 'Todo Ok',
-                status: true
-            });
+                if (list.length === 0)
+                    return (0, response_helper_1.errorResponse)(res, 'Mascota no encontrada', 404);
+                return (0, response_helper_1.successResponse)(res, 'Todo Ok', list);
+            }
+            catch (error) {
+                console.log('List PetOne Adoption', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error interno del servidor');
+            }
         });
     }
     listMyAdoptions(req, res) {

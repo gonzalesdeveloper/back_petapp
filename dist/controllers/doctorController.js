@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.doctorController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class DoctorController {
     getDoctorsHome(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -62,12 +63,16 @@ class DoctorController {
     getDetailDoctor(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdDoctor } = req.params;
-            const [list] = yield database_1.default.query('SELECT p.IdPersona, d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Foto, p.Referencia, d.Rating, d.Presentacion FROM `persona` p inner join doctor d on p.IdPersona = d.IdPersona WHERE d.IdDoctor = ?', [IdDoctor]);
-            res.json({
-                message: 'Todo Correcto',
-                status: true,
-                data: list
-            });
+            try {
+                const [list] = yield database_1.default.query('SELECT p.IdPersona, d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Foto, p.Referencia, d.Rating, d.Presentacion FROM `persona` p inner join doctor d on p.IdPersona = d.IdPersona WHERE d.IdDoctor = ?', [IdDoctor]);
+                if (list.length === 0)
+                    return (0, response_helper_1.errorResponse)(res, 'No se encontró el registro', 404);
+                return (0, response_helper_1.successResponse)(res, 'Registro Encontrado', list);
+            }
+            catch (error) {
+                console.log('One Doctor Detail', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+            }
         });
     }
     doctorFavorito(req, res) {

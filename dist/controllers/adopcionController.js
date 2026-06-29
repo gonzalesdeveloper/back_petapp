@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.adopcionController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class AdopcionController {
     setStateAdoption(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -22,20 +23,15 @@ class AdopcionController {
             const conn = yield database_1.default.getConnection();
             try {
                 yield conn.beginTransaction(); // ✅ CORRECTO
-                console.log('Inicio transacción');
                 // 🔹 1. Validar duplicado
                 const [existe] = yield conn.query(`
         SELECT * 
         FROM solicitud_adopcion 
         WHERE IdPersona = ? AND IdMascotaAdopcion = ?
       `, [IdPersona, IdMascotaAdopcion]);
-                console.log('Existe:', existe);
                 if (existe.length > 0) {
                     yield conn.rollback();
-                    return res.status(409).json({
-                        ok: false,
-                        message: "Ya existe una solicitud para esta mascota"
-                    });
+                    return (0, response_helper_1.errorResponse)(res, 'Ya Existe una solicitud para esta mascota', 409);
                 }
                 // 🔹 2. Validar estado mascota
                 const [estadoMascota] = yield conn.query(`
@@ -43,20 +39,13 @@ class AdopcionController {
         FROM mascota_adopcion
         WHERE IdMascotaAdopcion = ?
       `, [IdMascotaAdopcion]);
-                console.log('Estado mascota:', estadoMascota);
                 if (!estadoMascota.length) {
                     yield conn.rollback();
-                    return res.status(404).json({
-                        ok: false,
-                        message: 'Mascota no encontrada'
-                    });
+                    return (0, response_helper_1.errorResponse)(res, 'Mascota no encontrada', 404);
                 }
                 if (estadoMascota[0].Estado === 'Adoptado') {
                     yield conn.rollback();
-                    return res.status(409).json({
-                        ok: false,
-                        message: "La mascota ya fue adoptada"
-                    });
+                    return (0, response_helper_1.errorResponse)(res, 'Las Mascota ya fue Adoptada', 409);
                 }
                 // 🔹 3. Insertar solicitud
                 const [result] = yield conn.query(`
@@ -65,30 +54,19 @@ class AdopcionController {
         VALUES (?, ?, NOW(), 'Pendiente', ?)
       `, [IdPersona, IdMascotaAdopcion, Mensaje]);
                 const IdSolicitud = result.insertId;
-                console.log('Solicitud creada:', IdSolicitud);
                 // 🔹 4. Insertar historial
                 yield conn.query(`
         INSERT INTO adopcion_historial
         (IdSolicitud, EstadoAnterior, EstadoNuevo, FechaCambio)
         VALUES (?, NULL, 'Pendiente', NOW())
       `, [IdSolicitud]);
-                console.log('Historial insertado');
                 yield conn.commit();
-                console.log('Commit OK');
-                return res.json({
-                    ok: true,
-                    message: "Solicitud enviada correctamente",
-                    IdSolicitud
-                });
+                return (0, response_helper_1.successResponse)(res, 'Solicitud Enviada Correctamente', { IdSolicitud });
             }
             catch (error) {
-                console.error('ERROR BACKEND:', error);
+                console.error('Adoption Solicitud:', error);
                 yield conn.rollback();
-                return res.status(500).json({
-                    ok: false,
-                    message: "Error interno del servidor",
-                    detail: error.message
-                });
+                return (0, response_helper_1.errorResponse)(res, 'Error interno del servidor');
             }
             finally {
                 conn.release();
@@ -146,7 +124,7 @@ class AdopcionController {
         VALUES (?, ?, ?, NOW())
       `, [IdSolicitud, estadoAnterior, EstadoNuevo]);
                 yield conn.commit();
-                res.json({ ok: true });
+                res.json({ status: true });
             }
             catch (error) {
                 yield conn.rollback();
