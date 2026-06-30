@@ -14,43 +14,46 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.doctorFavController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class DoctorFavController {
     listDoctorFav(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
-            const [list] = yield database_1.default.query(`
-            SELECT 
-                d.IdDoctor,
-                p.Nombres,
-                p.Apellidos,
-                d.Presentacion,
-                p.Foto,
-                d.Rating,
-    
-                COUNT(c.IdComentario) AS TotalComentarios
-    
-            FROM doctor d
-    
-            INNER JOIN persona p 
-                ON d.IdPersona = p.IdPersona
-    
-            INNER JOIN favdoc fav 
-                ON d.IdDoctor = fav.IdDoctor
-    
-            LEFT JOIN comentario c 
-                ON c.comentable_id = d.IdDoctor
-                AND c.comentable_typo = 'doctor'
-    
-            WHERE fav.IdPersona = ?
-    
-            GROUP BY d.IdDoctor
-    
-        `, [IdPersona]);
-            res.json({
-                status: true,
-                message: 'Todo correcto',
-                data: list
-            });
+            try {
+                const [list] = yield database_1.default.query(`
+                SELECT 
+                    d.IdDoctor,
+                    p.Nombres,
+                    p.Apellidos,
+                    d.Presentacion,
+                    p.Foto,
+                    d.Rating,
+        
+                    COUNT(c.IdComentario) AS TotalComentarios
+        
+                FROM doctor d
+        
+                INNER JOIN persona p 
+                    ON d.IdPersona = p.IdPersona
+        
+                INNER JOIN favdoc fav 
+                    ON d.IdDoctor = fav.IdDoctor
+        
+                LEFT JOIN comentario c 
+                    ON c.comentable_id = d.IdDoctor
+                    AND c.comentable_typo = 'doctor'
+        
+                WHERE fav.IdPersona = ?
+        
+                GROUP BY d.IdDoctor
+        
+            `, [IdPersona]);
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+            }
+            catch (error) {
+                console.log('Error al listar doctores favoritos', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+            }
         });
     }
 }

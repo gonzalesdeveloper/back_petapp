@@ -18,29 +18,26 @@ const response_helper_1 = require("../helpers/response.helper");
 class FundacionController {
     getFundations(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const [list] = yield database_1.default.query('SELECT * FROM fundacion');
-            res.json({
-                status: true,
-                message: 'Todo Ok',
-                data: list
-            });
+            try {
+                const [list] = yield database_1.default.query('SELECT * FROM fundacion');
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+            }
+            catch (error) {
+                console.log('Error al listar Fundaciones', error);
+                (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+            }
         });
     }
     getFundationsSelect(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const [list] = yield database_1.default.query(`
-            SELECT DISTINCT 
-                f.IdFundacion, 
-                f.Nombre 
-            FROM fundacion f
-            INNER JOIN donacionfundacion df 
-                ON df.IdFundacion = f.IdFundacion
-        `);
-            res.json({
-                status: true,
-                message: 'Todo Ok',
-                data: list
-            });
+            try {
+                const [list] = yield database_1.default.query(`SELECT DISTINCT f.IdFundacion, f.Nombre FROM fundacion f INNER JOIN donacionfundacion df ON df.IdFundacion = f.IdFundacion`);
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+            }
+            catch (error) {
+                console.log('Error de Listado Fundaciones para Select', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+            }
         });
     }
     getOneFundation(req, res) {

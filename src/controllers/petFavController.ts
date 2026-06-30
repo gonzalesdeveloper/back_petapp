@@ -4,14 +4,15 @@ import pool from "../database";
 import { errorResponse, successResponse } from "../helpers/response.helper";
 
 class PetFavController{
-    async getFavPet(req: Request, res: Response){
+    async getFavPet(req: Request, res: Response): Promise<any>{
         const { IdPersona } = req.params;
-        const [list] = await pool.query('SELECT m.IdPet, m.Nombre, m.Apellidos, m.Tipo, m.Edad, m.Peso, m.Foto, f.Fecha FROM favpet f INNER JOIN pet m ON f.IdPet = m.IdPet WHERE f.IdPersona = ? ORDER BY m.Tipo, f.Fecha DESC', [IdPersona]);
-        res.json({
-            status: true,
-            message: 'Todo Ok',
-            data: list
-        });
+        try{
+            const [list] = await pool.query('SELECT m.IdPet, m.Nombre, m.Apellidos, m.Tipo, m.Edad, m.Peso, m.Foto, f.Fecha FROM favpet f INNER JOIN pet m ON f.IdPet = m.IdPet WHERE f.IdPersona = ? ORDER BY m.Tipo, f.Fecha DESC', [IdPersona]);
+            return successResponse(res, 'Listado Correctamente', list);
+        }catch(error){
+            console.log('Error al listar mascotas favoritas', error);
+            errorResponse(res, 'Error del Servidor');
+        }
     }
 
     /* pet fav */

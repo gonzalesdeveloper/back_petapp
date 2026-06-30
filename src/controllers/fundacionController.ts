@@ -4,29 +4,24 @@ import pool from "../database";
 import { errorResponse, successResponse } from "../helpers/response.helper";
 
 class FundacionController{
-    public async getFundations(req: Request, res: Response){
-        const [list] = await pool.query('SELECT * FROM fundacion');
-        res.json({
-            status: true,
-            message: 'Todo Ok',
-            data: list
-        })
+    public async getFundations(req: Request, res: Response): Promise <any>{
+        try{
+            const [list] = await pool.query<RowDataPacket[]>('SELECT * FROM fundacion');
+            return successResponse(res, 'Listado Correctamente', list);
+        }catch(error){
+            console.log('Error al listar Fundaciones', error);
+            errorResponse(res, 'Error del Servidor');
+        }
     }
 
-    public async getFundationsSelect(req: Request, res: Response){
-        const [list] = await pool.query(`
-            SELECT DISTINCT 
-                f.IdFundacion, 
-                f.Nombre 
-            FROM fundacion f
-            INNER JOIN donacionfundacion df 
-                ON df.IdFundacion = f.IdFundacion
-        `);
-        res.json({
-            status: true,
-            message: 'Todo Ok',
-            data: list
-        })
+    public async getFundationsSelect(req: Request, res: Response): Promise<any>{
+        try{
+            const [list] = await pool.query<RowDataPacket[]>(`SELECT DISTINCT f.IdFundacion, f.Nombre FROM fundacion f INNER JOIN donacionfundacion df ON df.IdFundacion = f.IdFundacion`);
+            return successResponse(res, 'Listado Correctamente', list);
+        }catch(error){
+            console.log('Error de Listado Fundaciones para Select', error);
+            return errorResponse(res, 'Error del Servidor');
+        }
     }
 
 
