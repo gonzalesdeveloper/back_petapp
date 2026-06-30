@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.eventoController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class EventoController {
     listEvento(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -21,13 +22,6 @@ class EventoController {
             try {
                 // 1️⃣ Obtener todos los eventos
                 const [eventos] = yield database_1.default.query('SELECT * FROM evento');
-                if (!eventos.length) {
-                    return res.json({
-                        data: [],
-                        status: true,
-                        message: 'No hay eventos registrados'
-                    });
-                }
                 // 2️⃣ Obtener todos los asistentes
                 const [asistentes] = yield database_1.default.query(`
             SELECT ea.IdEvento, p.IdPersona, p.Nombres, p.Foto
@@ -36,25 +30,17 @@ class EventoController {
             WHERE ea.Estado = 'asistir'
           `);
                 // 3️⃣ Asociar asistentes a sus eventos
-                const data = eventos.map((evento) => {
+                const data = eventos.map(evento => {
                     const personas = asistentes.filter((a) => a.IdEvento === evento.IdEvento);
                     const asistire = personas.some((a) => a.IdPersona == IdPersona);
                     return Object.assign(Object.assign({}, evento), { Asistentes: personas.slice(0, 3), TotalAsistentes: personas.length, Asisitire: asistire });
                 });
                 // 4️⃣ Devolver todo en una sola respuesta
-                res.json({
-                    data,
-                    status: true,
-                    message: 'Eventos y asistentes obtenidos correctamente'
-                });
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', data);
             }
             catch (error) {
-                console.error(error);
-                res.status(500).json({
-                    status: false,
-                    message: 'Error al listar eventos con asistentes',
-                    error
-                });
+                console.error('Error al obtener listado de eventos', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
             }
         });
     }
@@ -67,17 +53,17 @@ class EventoController {
                 if (existe.length > 0) {
                     // Si existe, eliminar (cancelar asistencia)
                     yield database_1.default.query('DELETE FROM evento_asistencia WHERE IdEvento = ? AND IdPersona = ?', [IdEvento, IdPersona]);
-                    return res.json({ message: 'Asistencia cancelada', asistiendo: false });
+                    return (0, response_helper_1.successResponse)(res, 'Asistencia Cancelada', { asistiendo: false });
                 }
                 else {
                     // Si no existe, insertar (asistir)
                     yield database_1.default.query('INSERT INTO evento_asistencia (IdEvento, IdPersona) VALUES (?, ?)', [IdEvento, IdPersona]);
-                    return res.json({ message: 'Asistencia registrada', asistiendo: true });
+                    return (0, response_helper_1.successResponse)(res, 'Asistencia Registrada', { asistiendo: true });
                 }
             }
             catch (error) {
-                console.error(error);
-                res.status(500).json({ message: 'Error al registrar asistencia' });
+                console.error('Error al registrar o cancelar asistencia', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
             }
         });
     }

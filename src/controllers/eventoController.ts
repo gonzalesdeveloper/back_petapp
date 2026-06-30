@@ -1,23 +1,17 @@
 import { Request, Response } from "express";
+import { RowDataPacket } from "mysql2";
 import pool from "../database";
+import { errorResponse, successResponse } from "../helpers/response.helper";
 
 class EventoController{
     public async listEvento(req: Request, res: Response): Promise<any> {
       const { IdPersona } = req.params;
         try {
           // 1️⃣ Obtener todos los eventos
-          const [eventos]: any = await pool.query('SELECT * FROM evento');
-      
-          if (!eventos.length) {
-            return res.json({
-              data: [],
-              status: true,
-              message: 'No hay eventos registrados'
-            });
-          }
+          const [eventos] = await pool.query<RowDataPacket[]>('SELECT * FROM evento');
       
           // 2️⃣ Obtener todos los asistentes
-          const [asistentes]: any = await pool.query(`
+          const [asistentes] = await pool.query<RowDataPacket[]>(`
             SELECT ea.IdEvento, p.IdPersona, p.Nombres, p.Foto
             FROM evento_asistencia ea
             INNER JOIN persona p ON ea.IdPersona = p.IdPersona
@@ -25,7 +19,7 @@ class EventoController{
           `);
       
           // 3️⃣ Asociar asistentes a sus eventos
-          const data = eventos.map((evento: any) => {
+          const data = eventos.map( evento => {
             const personas = asistentes.filter((a: any) => a.IdEvento === evento.IdEvento);
             const asistire = personas.some((a: any) => a.IdPersona == IdPersona);
             return {
@@ -37,18 +31,10 @@ class EventoController{
           });
       
           // 4️⃣ Devolver todo en una sola respuesta
-          res.json({
-            data,
-            status: true,
-            message: 'Eventos y asistentes obtenidos correctamente'
-          });
+          return successResponse(res, 'Listado Correctamente', data);
         } catch (error) {
-          console.error(error);
-          res.status(500).json({
-            status: false,
-            message: 'Error al listar eventos con asistentes',
-            error
-          });
+          console.error('Error al obtener listado de eventos', error);
+          return errorResponse(res, 'Error del Servidor');
         }
       }
       
@@ -57,7 +43,7 @@ class EventoController{
 
         try {
             // Verificar si ya existe
-            const [existe]: any = await pool.query(
+            const [existe] = await pool.query<RowDataPacket[]>(
             'SELECT * FROM evento_asistencia WHERE IdEvento = ? AND IdPersona = ?',
             [IdEvento, IdPersona]
             );
@@ -68,18 +54,18 @@ class EventoController{
                 'DELETE FROM evento_asistencia WHERE IdEvento = ? AND IdPersona = ?',
                 [IdEvento, IdPersona]
             );
-            return res.json({ message: 'Asistencia cancelada', asistiendo: false });
+            return successResponse(res, 'Asistencia Cancelada', { asistiendo: false } );
             } else {
             // Si no existe, insertar (asistir)
             await pool.query(
                 'INSERT INTO evento_asistencia (IdEvento, IdPersona) VALUES (?, ?)',
                 [IdEvento, IdPersona]
             );
-            return res.json({ message: 'Asistencia registrada', asistiendo: true });
+            return successResponse(res, 'Asistencia Registrada', { asistiendo: true })
             }
         } catch (error) {
-            console.error(error);
-            res.status(500).json({ message: 'Error al registrar asistencia' });
+            console.error('Error al registrar o cancelar asistencia' , error);
+            return errorResponse(res, 'Error del Servidor');
         }
     }
 }

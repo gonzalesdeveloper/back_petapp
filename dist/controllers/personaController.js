@@ -16,6 +16,7 @@ exports.personaController = void 0;
 const database_1 = __importDefault(require("../database"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const token_util_1 = require("../utils/token.util");
+const response_helper_1 = require("../helpers/response.helper");
 const saltRounds = 10;
 class PersonaController {
     getPerson(req, res) {
@@ -31,16 +32,18 @@ class PersonaController {
     getOnePerson(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona } = req.params;
-            const [list] = yield database_1.default.query('SELECT * FROM persona WHERE IdPersona = ?', [IdPersona]);
-            list[0].Password = '';
-            const fecha = new Date(list[0].Nacimiento);
-            const fechaFormateada = fecha.toISOString().split('T')[0];
-            list[0].Nacimiento = fechaFormateada;
-            res.json({
-                data: list,
-                status: true,
-                message: 'Todo correcto'
-            });
+            try {
+                const [list] = yield database_1.default.query('SELECT * FROM persona WHERE IdPersona = ?', [IdPersona]);
+                list[0].Password = '';
+                const fecha = new Date(list[0].Nacimiento);
+                const fechaFormateada = fecha.toISOString().split('T')[0];
+                list[0].Nacimiento = fechaFormateada;
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+            }
+            catch (error) {
+                console.log('Error al encontrar una persona', error);
+                (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+            }
         });
     }
     /* editar persona */
@@ -73,6 +76,8 @@ class PersonaController {
                 if (requiereToken) {
                     // Obtener persona actualizada
                     const [rows] = yield database_1.default.query('SELECT IdPersona, Email, Nombres, Apellidos, Foto FROM persona WHERE IdPersona = ?', [IdPersona]);
+                    if (rows.length === 0)
+                        return (0, response_helper_1.errorResponse)(res, 'Persona no encontrada', 404);
                     const persona = rows[0];
                     const payload = {
                         IdPersona: persona.IdPersona,
@@ -82,19 +87,15 @@ class PersonaController {
                     accessToken = (0, token_util_1.generateAccessToken)(payload);
                     refreshToken = (0, token_util_1.generateRefreshToken)(payload);
                 }
-                res.status(201).json({
-                    status: true,
-                    message: 'Usuario Actualizado',
+                return (0, response_helper_1.successResponse)(res, 'Usuario Actualizado', {
                     accessToken,
                     refreshToken,
                     userLog
                 });
             }
             catch (error) {
-                console.log(error);
-                res.status(500).json({
-                    error: 'Error al Actualizar Usuario'
-                });
+                console.log('Error al Editar Persona', error);
+                (0, response_helper_1.errorResponse)(res, 'Error al Editar Persona');
             }
         });
     }

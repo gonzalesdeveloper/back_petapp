@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import pool from "../database";
 import bcrypt from 'bcrypt';
 import { generateAccessToken, generateRefreshToken } from "../utils/token.util";
+import { errorResponse, successResponse } from "../helpers/response.helper";
+import { RowDataPacket } from "mysql2";
 
 const saltRounds = 10;
 
@@ -15,24 +17,25 @@ class PersonaController{
         });
     }
 
-    async getOnePerson(req: Request, res: Response){
-        const { IdPersona } = req.params;        
-        const [list] : any = await pool.query('SELECT * FROM persona WHERE IdPersona = ?' , [IdPersona]);
+    async getOnePerson(req: Request, res: Response):Promise<any>{
+        const { IdPersona } = req.params;
+        try{
+          const [list] : any = await pool.query('SELECT * FROM persona WHERE IdPersona = ?' , [IdPersona]);
+  
+          list[0].Password = '';
+          const fecha = new Date(list[0].Nacimiento);
+          const fechaFormateada = fecha.toISOString().split('T')[0];
+          list[0].Nacimiento = fechaFormateada;
 
-        list[0].Password = '';
-        const fecha = new Date(list[0].Nacimiento);
-        const fechaFormateada = fecha.toISOString().split('T')[0];
-        list[0].Nacimiento = fechaFormateada;
-        
-        res.json({
-            data: list,
-            status: true,
-            message: 'Todo correcto'
-        })
+          return successResponse(res, 'Listado Correctamente', list);
+        }catch(error){
+          console.log('Error al encontrar una persona', error);
+          errorResponse(res, 'Error del Servidor');
+        }
     }
 
     /* editar persona */
-    public async editPerson(req: Request, res: Response){
+    public async editPerson(req: Request, res: Response): Promise<any>{
         const { IdPersona} = req.params;
         const data = req.body;
         
@@ -61,11 +64,13 @@ class PersonaController{
 
             if (requiereToken) {
                 // Obtener persona actualizada
-                const [rows]: any = await pool.query(
+                const [rows] = await pool.query<RowDataPacket[]>(
                   'SELECT IdPersona, Email, Nombres, Apellidos, Foto FROM persona WHERE IdPersona = ?',
                   [IdPersona]
                 );
-          
+
+                if( rows.length === 0 ) return errorResponse(res, 'Persona no encontrada', 404);
+
                 const persona = rows[0];
           
                 const payload = {
@@ -78,20 +83,16 @@ class PersonaController{
                 accessToken = generateAccessToken(payload);
                 refreshToken = generateRefreshToken(payload);
               }
-
-            res.status(201).json({ 
-              status: true,
-              message: 'Usuario Actualizado',
+            
+            return successResponse(res, 'Usuario Actualizado', {
               accessToken,
               refreshToken,
               userLog
             });
         } catch (error) {
-            console.log(error);
+            console.log('Error al Editar Persona', error);
             
-            res.status(500).json({ 
-              error: 'Error al Actualizar Usuario'
-            });
+            errorResponse(res, 'Error al Editar Persona');
         }
     }
 
