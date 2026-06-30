@@ -48,7 +48,7 @@ class DoctorController{
             data: list
         });
     }
-    async getDetailDoctor(req: Request, res: Response){
+    async getDetailDoctor(req: Request, res: Response): Promise<any>{
         const { IdDoctor } = req.params;
         try{
             const [list] = await pool.query<RowDataPacket[]>('SELECT p.IdPersona, d.IdDoctor, p.Nombres, p.Apellidos, p.Direccion, p.Foto, p.Referencia, d.Rating, d.Presentacion FROM `persona` p inner join doctor d on p.IdPersona = d.IdPersona WHERE d.IdDoctor = ?', [IdDoctor]);

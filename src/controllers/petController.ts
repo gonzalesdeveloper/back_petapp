@@ -118,55 +118,56 @@ class PetController{
     })
   }
   public async listPetAdoption(req: Request, res: Response){
-    const { IdPersona } = req.params;
-      const [list] = await  pool.query(`
-      SELECT 
-      p.IdPet,
-      p.Nombre,
-      p.Apellidos,
-      p.Foto,
-      tm.Descripcion AS TipoMascota,
-      p.Edad,
-      p.Peso,
-      
-      ma.Estado,
-      ma.Fecha_Registro,
-      ma.Lugar_Entrega,
-      ma.Vacunas_Completas,
-      ma.Castrado,
-      ma.Tipo_Adopcion,
-      ma.Costo_Adopcion,
-      ma.Contacto,
-      ma.Descripcion AS Detalle_Adopcion,
+    try{
+      const { IdPersona } = req.params;
+      const [list] = await  pool.query<RowDataPacket[]>(`
+        SELECT 
+        p.IdPet,
+        p.Nombre,
+        p.Apellidos,
+        p.Foto,
+        tm.Descripcion AS TipoMascota,
+        p.Edad,
+        p.Peso,
+        
+        ma.Estado,
+        ma.Fecha_Registro,
+        ma.Lugar_Entrega,
+        ma.Vacunas_Completas,
+        ma.Castrado,
+        ma.Tipo_Adopcion,
+        ma.Costo_Adopcion,
+        ma.Contacto,
+        ma.Descripcion AS Detalle_Adopcion,
+  
+        pub.Nombre_Contacto,
+        pub.Telefono_Contacto
+  
+      FROM pet p
+  
+      INNER JOIN mascota_adopcion ma ON p.IdPet = ma.IdPet
+      INNER JOIN tipomascota tm ON p.IdTipoMascota = tm.IdTipoMascota
+  
+      -- 🔥 NUEVO
+      INNER JOIN publicacion pub 
+        ON pub.IdPet = p.IdPet
+  
+      WHERE pub.TipoPublicacion = 'adopcion'
+      AND pub.Estado = 'aprobado'
+      AND ma.Estado = 'Disponible'
+  
+      AND ma.IdMascotaAdopcion NOT IN (
+        SELECT IdMascotaAdopcion
+        FROM solicitud_adopcion
+        WHERE IdPersona = ?
+      );
+      `, [IdPersona]);
 
-      pub.Nombre_Contacto,
-      pub.Telefono_Contacto
-
-    FROM pet p
-
-    INNER JOIN mascota_adopcion ma ON p.IdPet = ma.IdPet
-    INNER JOIN tipomascota tm ON p.IdTipoMascota = tm.IdTipoMascota
-
-    -- 🔥 NUEVO
-    INNER JOIN publicacion pub 
-      ON pub.IdPet = p.IdPet
-
-    WHERE pub.TipoPublicacion = 'adopcion'
-    AND pub.Estado = 'aprobado'
-    AND ma.Estado = 'Disponible'
-
-    AND ma.IdMascotaAdopcion NOT IN (
-      SELECT IdMascotaAdopcion
-      FROM solicitud_adopcion
-      WHERE IdPersona = ?
-    );
-    `, [IdPersona]);
-
-    res.json({
-      data: list,
-      message: 'Todo Ok',
-      status: true
-    })
+      successResponse(res, 'Listado Correcto', list)
+    }catch(error){
+      console.log('Error List Adoption', error);
+      errorResponse(res, 'Error en el Servidor')
+    }
   }
 
   public async listPetOneAdoption(req:Request, res: Response):Promise<any>{
@@ -233,29 +234,31 @@ class PetController{
   }
 
   async listMyAdoptions(req: Request, res: Response){
-    const { IdPersona } = req.params;
-    const [ list ] = await pool.query(`SELECT sa.IdSolicitud, sa.Estado_Solicitud, sa.Fecha_Solicitud, p.Nombre, p.Apellidos, p.Edad, p.Foto,
-    tm.Descripcion AS TipoMascota, p.Peso
-    
-    FROM solicitud_adopcion sa
-    
-    INNER JOIN mascota_adopcion ma 
-      ON sa.IdMascotaAdopcion = ma.IdMascotaAdopcion
-    
-    INNER JOIN pet p 
-      ON ma.IdPet = p.IdPet
-    
-    INNER JOIN tipomascota tm 
-      ON p.IdTipoMascota = tm.IdTipoMascota
-    
-    WHERE sa.IdPersona = ?
-    
-    ORDER BY sa.Fecha_Solicitud DESC;`, [ IdPersona ]);
-    res.json({
-      status: true,
-      message: 'Todo Ok',
-      data: list
-    })
+    try{
+      const { IdPersona } = req.params;
+      const [ list ] = await pool.query(`SELECT sa.IdSolicitud, sa.Estado_Solicitud, sa.Fecha_Solicitud, p.Nombre, p.Apellidos, p.Edad, p.Foto,
+      tm.Descripcion AS TipoMascota, p.Peso
+      
+      FROM solicitud_adopcion sa
+      
+      INNER JOIN mascota_adopcion ma 
+        ON sa.IdMascotaAdopcion = ma.IdMascotaAdopcion
+      
+      INNER JOIN pet p 
+        ON ma.IdPet = p.IdPet
+      
+      INNER JOIN tipomascota tm 
+        ON p.IdTipoMascota = tm.IdTipoMascota
+      
+      WHERE sa.IdPersona = ?
+      
+      ORDER BY sa.Fecha_Solicitud DESC;`, [ IdPersona ]);
+      
+      successResponse(res, 'Listado Correctamente', list);
+    }catch(error){
+      console.log('Error Lista My Adoption', error);
+      errorResponse(res, 'Error del Servidor');
+    }
   }
 }
 

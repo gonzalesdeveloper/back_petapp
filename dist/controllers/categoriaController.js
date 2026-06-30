@@ -14,25 +14,30 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.categoriaController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class CategoriaController {
     listCategoria(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const [list] = yield database_1.default.query('SELECT * FROM categorias');
-            res.json({
-                data: list,
-                status: true,
-                message: 'Todo Correcto'
-            });
+            try {
+                const [list] = yield database_1.default.query('SELECT * FROM categorias');
+                (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+            }
+            catch (error) {
+                console.log('Lista Categorias', error);
+                (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+            }
         });
     }
     listCategoriaImportant(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const [list] = yield database_1.default.query('SELECT * FROM categorias WHERE IMPORTANCIA = 1');
-            res.json({
-                data: list,
-                status: true,
-                message: 'Todo Correcto'
-            });
+            try {
+                const [list] = yield database_1.default.query('SELECT * FROM categorias WHERE IMPORTANCIA = 1');
+                (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+            }
+            catch (error) {
+                console.log('Listado de Categorias Importantes', error);
+                (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+            }
         });
     }
 }
