@@ -14,26 +14,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.vetController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class VetController {
     listVet(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const [list] = yield database_1.default.query('SELECT * FROM veterinaria');
-            res.json({
-                data: list,
-                status: true,
-                message: 'Todo Correcto'
-            });
+            try {
+                const [list] = yield database_1.default.query('SELECT * FROM veterinaria');
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+            }
+            catch (error) {
+                console.log('Error al listar veterinarias', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+            }
         });
     }
     listVetUnique(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdVeterinaria } = req.params;
-            const [list] = yield database_1.default.query('SELECT * FROM veterinaria WHERE IdVeterinaria = ?', IdVeterinaria);
-            res.json({
-                data: list,
-                status: true,
-                message: 'Todo Correcto'
-            });
+            try {
+                const [list] = yield database_1.default.query('SELECT * FROM veterinaria WHERE IdVeterinaria = ?', IdVeterinaria);
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+            }
+            catch (error) {
+                console.log('Error al obtener una veterinaria', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+            }
         });
     }
 }

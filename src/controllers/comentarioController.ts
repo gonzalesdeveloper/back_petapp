@@ -92,12 +92,13 @@ class ComentarioController{
     /* COMENTARIOS HACIA LA VETERINARIA */
     async getComentarioVet(req: Request, res: Response){
         const { IdVeterinaria } = req.params;
-        const [list] = await pool.query('SELECT c.IdComentario, c.IdPersona, p.Nombres, p.Apellidos, p.Foto, c.Titulo, c.Descripcion, c.Rating, c.Fecha, c.comentable_id, c.comentable_typo, c.Estado FROM comentario c INNER JOIN persona p ON c.IdPersona = p.IdPersona WHERE comentable_typo = ? AND comentable_id = ?', ['veterinaria', IdVeterinaria]);
-        res.json({
-            message: 'Todo Correcto',
-            status: true,
-            data: list
-        });
+        try{
+            const [list] = await pool.query<RowDataPacket[]>('SELECT c.IdComentario, c.IdPersona, p.Nombres, p.Apellidos, p.Foto, c.Titulo, c.Descripcion, c.Rating, c.Fecha, c.comentable_id, c.comentable_typo, c.Estado FROM comentario c INNER JOIN persona p ON c.IdPersona = p.IdPersona WHERE comentable_typo = ? AND comentable_id = ?', ['veterinaria', IdVeterinaria]);
+            return successResponse(res, 'Listado Correctamente', list);
+        }catch(error){
+            console.log('Error al obtener los comentarios de la veterinaria', error);
+            return errorResponse(res, 'Error del Servidor');
+        }
     }
 
     /* COMENTARIOS HACIA LA FUNDACION */

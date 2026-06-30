@@ -1,24 +1,28 @@
 import { Request, Response } from "express";
+import { RowDataPacket } from "mysql2";
 import pool from "../database";
+import { errorResponse, successResponse } from "../helpers/response.helper";
 
 class VetController{
-    public async listVet(req: Request, res: Response){
-        const [list] = await pool.query('SELECT * FROM veterinaria');
-        res.json({
-            data: list,
-            status: true,
-            message: 'Todo Correcto'
-        });
+    public async listVet(req: Request, res: Response): Promise<any>{
+        try{
+            const [list] = await pool.query<RowDataPacket[]>('SELECT * FROM veterinaria');
+            return successResponse(res, 'Listado Correctamente', list);
+        }catch(error){
+            console.log('Error al listar veterinarias', error);
+            return errorResponse(res, 'Error del Servidor');
+        }
     }
 
-    public async listVetUnique(req: Request, res: Response){
+    public async listVetUnique(req: Request, res: Response): Promise<any>{
         const { IdVeterinaria } = req.params;
-        const [list] = await pool.query('SELECT * FROM veterinaria WHERE IdVeterinaria = ?', IdVeterinaria);
-        res.json({
-            data: list,
-            status: true,
-            message: 'Todo Correcto'
-        });
+        try{
+            const [list] = await pool.query<RowDataPacket[]>('SELECT * FROM veterinaria WHERE IdVeterinaria = ?', IdVeterinaria);
+            return successResponse(res, 'Listado Correctamente', list);
+        }catch(error){
+            console.log('Error al obtener una veterinaria', error);
+            return errorResponse(res, 'Error del Servidor');
+        }
     }
 }
 
