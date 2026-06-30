@@ -173,11 +173,11 @@ class PetController {
         WHERE IdPersona = ?
       );
       `, [IdPersona]);
-                (0, response_helper_1.successResponse)(res, 'Listado Correcto', list);
+                return (0, response_helper_1.successResponse)(res, 'Listado Correcto', list);
             }
             catch (error) {
                 console.log('Error List Adoption', error);
-                (0, response_helper_1.errorResponse)(res, 'Error en el Servidor');
+                return (0, response_helper_1.errorResponse)(res, 'Error en el Servidor');
             }
         });
     }
@@ -264,11 +264,11 @@ class PetController {
       WHERE sa.IdPersona = ?
       
       ORDER BY sa.Fecha_Solicitud DESC;`, [IdPersona]);
-                (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
             }
             catch (error) {
                 console.log('Error Lista My Adoption', error);
-                (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
             }
         });
     }

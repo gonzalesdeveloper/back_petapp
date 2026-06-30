@@ -20,11 +20,11 @@ class BlogController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const [list] = yield database_1.default.query('SELECT * FROM blog');
-                (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
             }
             catch (error) {
                 console.log('Error Listar Blogs', error);
-                (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
             }
         });
     }
@@ -38,11 +38,11 @@ class BlogController {
                 }
                 const [Fotos] = yield database_1.default.query('SELECT * FROM blog_foto WHERE IdBlog = ?', [IdBlog]);
                 const data = [Object.assign(Object.assign({}, list[0]), { Fotos })];
-                (0, response_helper_1.successResponse)(res, 'Listado Correctamente', data);
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', data);
             }
             catch (error) {
                 console.log('Error al obtener el blog', error);
-                (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
             }
         });
     }

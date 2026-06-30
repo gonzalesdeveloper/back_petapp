@@ -14,27 +14,31 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.donacionController = void 0;
 const database_1 = __importDefault(require("../database"));
+const response_helper_1 = require("../helpers/response.helper");
 class DonacionController {
     insertDonacion(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdFundacion, IdPersona, Tipo_Moneda, Monto, MetodoPago, Mensaje } = req.body;
             const comprobante = req.file ? req.file.path : null;
-            yield database_1.default.query(`
-            INSERT INTO donacion (
-                IdFundacion,
-                IdPersona,
-                Tipo_Moneda,
-                Monto,
-                MetodoPago,
-                Mensaje,
-                Comprobante
-            )
-            VALUES (?,?,?,?,?,?,?)
-        `, [IdFundacion, IdPersona || null, Tipo_Moneda, Monto, MetodoPago, Mensaje, comprobante]);
-            res.json({
-                status: true,
-                message: 'Guardado con Éxito'
-            });
+            try {
+                yield database_1.default.query(`
+                INSERT INTO donacion (
+                    IdFundacion,
+                    IdPersona,
+                    Tipo_Moneda,
+                    Monto,
+                    MetodoPago,
+                    Mensaje,
+                    Comprobante
+                )
+                VALUES (?,?,?,?,?,?,?)
+            `, [IdFundacion, IdPersona || null, Tipo_Moneda, Monto, MetodoPago, Mensaje, comprobante]);
+                return (0, response_helper_1.successResponse)(res, 'Donación Registrada Correctamente');
+            }
+            catch (error) {
+                console.log('Inserccion Donacion Fallida', error);
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+            }
         });
     }
     listMetodoDonacion(req, res) {

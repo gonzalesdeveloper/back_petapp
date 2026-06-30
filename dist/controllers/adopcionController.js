@@ -19,7 +19,6 @@ class AdopcionController {
     setStateAdoption(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { IdPersona, IdMascotaAdopcion, Mensaje } = req.body;
-            console.log(IdPersona, IdMascotaAdopcion);
             const conn = yield database_1.default.getConnection();
             try {
                 yield conn.beginTransaction(); // ✅ CORRECTO

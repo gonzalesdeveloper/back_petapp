@@ -1,30 +1,34 @@
 import { Request, Response } from "express";
 import pool from "../database";
+import { successResponse, errorResponse } from "../helpers/response.helper";
 
 class DonacionController{
-    async insertDonacion(req: Request, res: Response){
+    async insertDonacion(req: Request, res: Response): Promise<any>{
 
         const { IdFundacion, IdPersona, Tipo_Moneda, Monto, MetodoPago, Mensaje } = req.body;
     
         const comprobante = req.file ? req.file.path : null;
+
+        try{
+            await pool.query(`
+                INSERT INTO donacion (
+                    IdFundacion,
+                    IdPersona,
+                    Tipo_Moneda,
+                    Monto,
+                    MetodoPago,
+                    Mensaje,
+                    Comprobante
+                )
+                VALUES (?,?,?,?,?,?,?)
+            `,[ IdFundacion, IdPersona || null, Tipo_Moneda, Monto, MetodoPago, Mensaje, comprobante ]);
+        
+            return successResponse(res, 'Donación Registrada Correctamente')
+        }catch(error){
+            console.log('Inserccion Donacion Fallida', error);
+            return errorResponse(res, 'Error del Servidor');
+        }
     
-        await pool.query(`
-            INSERT INTO donacion (
-                IdFundacion,
-                IdPersona,
-                Tipo_Moneda,
-                Monto,
-                MetodoPago,
-                Mensaje,
-                Comprobante
-            )
-            VALUES (?,?,?,?,?,?,?)
-        `,[ IdFundacion, IdPersona || null, Tipo_Moneda, Monto, MetodoPago, Mensaje, comprobante ]);
-    
-        res.json({
-            status: true,
-            message: 'Guardado con Éxito'
-        });
     }
 
     async listMetodoDonacion(req: Request, res: Response){

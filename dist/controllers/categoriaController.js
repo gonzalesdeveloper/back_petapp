@@ -20,11 +20,11 @@ class CategoriaController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const [list] = yield database_1.default.query('SELECT * FROM categorias');
-                (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
             }
             catch (error) {
                 console.log('Lista Categorias', error);
-                (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
             }
         });
     }
@@ -32,11 +32,11 @@ class CategoriaController {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const [list] = yield database_1.default.query('SELECT * FROM categorias WHERE IMPORTANCIA = 1');
-                (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
+                return (0, response_helper_1.successResponse)(res, 'Listado Correctamente', list);
             }
             catch (error) {
                 console.log('Listado de Categorias Importantes', error);
-                (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
+                return (0, response_helper_1.errorResponse)(res, 'Error del Servidor');
             }
         });
     }

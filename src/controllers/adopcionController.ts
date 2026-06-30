@@ -6,7 +6,6 @@ import { errorResponse, successResponse } from "../helpers/response.helper";
 class AdopcionController{
   async setStateAdoption(req: Request, res: Response): Promise<any> {
     const { IdPersona, IdMascotaAdopcion, Mensaje } = req.body;
-    console.log(IdPersona, IdMascotaAdopcion);
     
     const conn = await pool.getConnection();
   

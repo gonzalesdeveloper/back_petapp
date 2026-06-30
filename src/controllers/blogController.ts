@@ -7,10 +7,10 @@ class BlogController{
     public async listBlog(req: Request, res: Response): Promise<any>{
         try{
             const [list] = await pool.query('SELECT * FROM blog');
-            successResponse(res, 'Listado Correctamente', list);
+            return successResponse(res, 'Listado Correctamente', list);
         }catch(error){
             console.log('Error Listar Blogs', error);
-            errorResponse(res, 'Error del Servidor');
+            return errorResponse(res, 'Error del Servidor');
         }
     }
 
@@ -23,10 +23,10 @@ class BlogController{
             }
             const [Fotos] = await pool.query<RowDataPacket[]>('SELECT * FROM blog_foto WHERE IdBlog = ?', [IdBlog]);
             const data = [{ ...list[0], Fotos }]
-            successResponse(res, 'Listado Correctamente', data);
+            return successResponse(res, 'Listado Correctamente', data);
         }catch(error){
             console.log('Error al obtener el blog', error);
-            errorResponse(res, 'Error del Servidor');
+            return errorResponse(res, 'Error del Servidor');
         }
     }
 }

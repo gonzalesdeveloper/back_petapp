@@ -117,7 +117,7 @@ class PetController{
       message: "Listo Correcto"
     })
   }
-  public async listPetAdoption(req: Request, res: Response){
+  public async listPetAdoption(req: Request, res: Response): Promise<any>{
     try{
       const { IdPersona } = req.params;
       const [list] = await  pool.query<RowDataPacket[]>(`
@@ -163,10 +163,10 @@ class PetController{
       );
       `, [IdPersona]);
 
-      successResponse(res, 'Listado Correcto', list)
+      return successResponse(res, 'Listado Correcto', list)
     }catch(error){
       console.log('Error List Adoption', error);
-      errorResponse(res, 'Error en el Servidor')
+      return errorResponse(res, 'Error en el Servidor')
     }
   }
 
@@ -233,7 +233,7 @@ class PetController{
     }
   }
 
-  async listMyAdoptions(req: Request, res: Response){
+  async listMyAdoptions(req: Request, res: Response): Promise<any>{
     try{
       const { IdPersona } = req.params;
       const [ list ] = await pool.query(`SELECT sa.IdSolicitud, sa.Estado_Solicitud, sa.Fecha_Solicitud, p.Nombre, p.Apellidos, p.Edad, p.Foto,
@@ -254,10 +254,10 @@ class PetController{
       
       ORDER BY sa.Fecha_Solicitud DESC;`, [ IdPersona ]);
       
-      successResponse(res, 'Listado Correctamente', list);
+      return successResponse(res, 'Listado Correctamente', list);
     }catch(error){
       console.log('Error Lista My Adoption', error);
-      errorResponse(res, 'Error del Servidor');
+      return errorResponse(res, 'Error del Servidor');
     }
   }
 }
